@@ -263,6 +263,13 @@ html[lang=ar] .label{letter-spacing:0}
 [dir=rtl] .sq .co.r{left:3px;right:auto}
 #moves{position:relative}
 .exp{display:flex;flex-direction:column;gap:6px}
+.hlist{display:flex;flex-direction:column}
+.hrow{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.hrow:first-child{border-top:0;padding-top:0}
+.hmain{display:flex;align-items:center;gap:12px;min-width:0}
+.hmain .t{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hacts{display:flex;flex-wrap:wrap;gap:6px;padding-left:22px}
+[dir=rtl] .hacts{padding-left:0;padding-right:22px}
 .exprow{display:flex;flex-wrap:wrap;gap:6px}
 .btn.lichess{background:#2b2b2b;border-color:#2b2b2b;color:#fff}
 .copyta{width:100%;font:500 .85rem/1.45 var(--f-mono);padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);resize:vertical;direction:ltr}
@@ -2259,6 +2266,9 @@ const AR = {
   "You're using the offline version. Everything is saved on this device only. You can run in-person tournaments with player names and play on one shared screen. To play friends online, open the": 'إنت شغال على النسخة الأوفلاين، وكل حاجة متخزنة على الجهاز ده بس. تقدر تعمل بطولات وش لوش بأسماء اللعيبة وتلعبوا على شاشة واحدة. عشان تلعب مع صحابك أونلاين، افتح',
   "You're using the offline version. Everything is saved on this device only. You can run in-person tournaments with player names and play on one shared screen.": 'إنت شغال على النسخة الأوفلاين، وكل حاجة متخزنة على الجهاز ده بس. تقدر تعمل بطولات وش لوش بأسماء اللعيبة وتلعبوا على شاشة واحدة.',
   'online Club 64': 'Club 64 الأونلاين',
+  'All games': 'كل الماتشات', 'All your games': 'كل ماتشاتك', 'History': 'الأرشيف', '← Play': '← العب', 'All': 'الكل', 'Vs friends': 'ضد الصحاب', 'Bots & one device': 'بوتات وجهاز واحد',
+  'No finished games yet. Games you finish against friends and bots show up here.': 'لسه مفيش ماتشات خلصت. أي ماتش تخلّصه ضد صحابك أو البوتات هيظهر هنا.',
+  'Bot and one-device games are saved on this device only.': 'ماتشات البوتات والجهاز الواحد متسجلة على الجهاز ده بس.', 'Lichess ↗': 'ليتشس ↗', 'White won': 'الأبيض كسب', 'Black won': 'الأسود كسب', 'No clock': 'من غير ساعة', 'View': 'اتفرج',
   'Analyze this game': 'حلّل الماتش ده', 'Copy FEN': 'انسخ الـ FEN', 'Copy PGN': 'انسخ الـ PGN', 'Open in Lichess ↗': 'افتحه في ليتشس ↗',
   'FEN copied.': 'الـ FEN اتنسخ ✔', 'PGN copied.': 'الـ PGN اتنسخ ✔', 'Copied.': 'اتنسخ ✔', 'Copy': 'انسخ', 'Close': 'اقفل', 'Copy FEN?': 'انسخ الـ FEN', 'Copy PGN?': 'انسخ الـ PGN',
   'Press and hold the text, then Copy.': 'دوس مطوّل على الكلام واختار نسخ.',
@@ -2346,6 +2356,7 @@ const AR_RX = [
   [/^vs (.+) · Level (\d+)$/, (m, a, b) => `ضد ${a} · مستوى ${b}`],
   [/^(.+) · (\d+) moves$/, (m, a, b) => `${a} · ${b} نقلة`],
   [/^Evaluation (.+)$/, (m, a) => `التقييم ${a}`],
+  [/^(\d+) moves$/, (m, a) => `${a} نقلة`],
   [/^(.+) vs (.+)$/, (m, a, b) => `${trPart(a)} ضد ${trPart(b)}`],
   [/^(.+?) · (.+)$/, (m, a, b) => `${trPart(a)} · ${trPart(b)}`],
 ];
@@ -2550,7 +2561,7 @@ function makeFirebaseDB(fs) {
       onSnapshot(next, onErr) {
         let last = null; const deliver = docs => { const p = post(docs); const k = JSON.stringify(p.docs.map(d => [d.id, d.data()])); if (k === last) return; last = k; next(p); };
         const off = build().onSnapshot(sn => deliver(sn.docs), e => onErr && onErr(err(e)));
-        const poll = ['games', 'invites'].includes(path) ? setInterval(() => { if (document.visibilityState === 'hidden') return; build().get({ source: 'server' }).then(sn => deliver(sn.docs)).catch(() => {}); }, 6000) : null;
+        const poll = path === 'invites' ? setInterval(() => { if (document.visibilityState === 'hidden') return; build().get({ source: 'server' }).then(sn => deliver(sn.docs)).catch(() => {}); }, 10000) : null;
         return () => { off(); if (poll) clearInterval(poll); };
       },
       doc: id => docRef(path + '/' + (id || rid(16))),
@@ -2629,7 +2640,7 @@ function startSubs() {
     }
     render();
   }, subErr);
-  db.collection('games').where('players', 'array-contains', S.uid).orderBy('createdAt', 'desc').limit(60).onSnapshot(s => {
+  db.collection('games').where('players', 'array-contains', S.uid).orderBy('createdAt', 'desc').limit(250).onSnapshot(s => {
     S.myGames = s.docs.map(d => ({ ...d.data(), id: d.id }));
     for (const g of S.myGames) {
       if (g.status === 'active' && !g.manual && !S.seenGames.has(g.id)) {
@@ -2686,7 +2697,7 @@ function routeFromHash() {
   const h = (location.hash || '').slice(1);
   if (h.startsWith('t-')) return { view: 'tour', id: h.slice(2) };
   if (h.startsWith('g-')) return { view: 'game', id: h.slice(2) };
-  if (['play', 'tours', 'friends', 'bots'].includes(h)) return { view: h };
+  if (['play', 'tours', 'friends', 'bots', 'history'].includes(h)) return { view: h };
   return { view: 'play' };
 }
 function syncContext() {
@@ -2696,6 +2707,14 @@ function syncContext() {
   subTour(tid);
   updatePresence();
 }
+async function refreshTourGames(tid) {
+  try {
+    const sn = await S.db.collection('games').where('tid', '==', tid).limit(1000).get(); if (S.tourId !== tid) return;
+    S.tourGames = sn.docs.map(d => ({ ...d.data(), id: d.id }));
+    for (const g of S.tourGames) if (g.status === 'active' && !g.manual && g.players.includes(S.uid) && !S.seenGames.has(g.id)) { S.seenGames.add(g.id); if (g.createdAt > S.loadedAt && !(S.route.view === 'game' && S.route.id === g.id)) { toast('Your game has started.'); go('game', g.id); } }
+    render();
+  } catch (e) {}
+}
 function subTour(tid) {
   if (S.tourId === tid) return;
   unsub.tour.forEach(f => { try { f(); } catch (e) {} }); unsub.tour = [];
@@ -2704,7 +2723,9 @@ function subTour(tid) {
   if (!tid) return;
   unsub.tour.push(S.db.doc('tournaments/' + tid).onSnapshot(s => {
     if (S.tourId !== tid) return;
-    S.tour = s.exists ? { ...s.data(), id: s.id } : null; S.tourMissing = !s.exists; render();
+    const prevGen = S.tour && S.tour.gen; S.tour = s.exists ? { ...s.data(), id: s.id } : null; S.tourMissing = !s.exists;
+    if (S.tour && S.tour.gen && S.tour.gen !== prevGen) refreshTourGames(tid);
+    render();
   }, subErr));
   unsub.tour.push(S.db.collection('games').where('tid', '==', tid).limit(1000).onSnapshot(s => {
     if (S.tourId !== tid) return;
@@ -2840,11 +2861,12 @@ async function onlineMove(from, to, promo) {
   const ng = { ...g, ...upd };
   S.game = ng; S.obs[g.id] = { ply: ng.ply, at: t }; S.sel = null; snd(!!m.captured); render();
   emitGame(ng);
-  try { await w(S.db.doc('games/' + g.id).update(upd)); } catch (e) {}
+  try { await w(S.db.doc('games/' + g.id).update(upd)); if (upd.status === 'finished') bumpTour(g.tid); } catch (e) {}
 }
+function bumpTour(tid) { if (tid) S.db.doc('tournaments/' + tid).update({ gen: now() }).catch(() => {}); }
 async function gameUpdate(upd) {
   const g = S.game; if (!g) return; const ng = { ...g, ...upd }; S.game = ng; render(); emitGame(ng);
-  try { await w(S.db.doc('games/' + g.id).update(upd)); } catch (e) {}
+  try { await w(S.db.doc('games/' + g.id).update(upd)); if (upd.status === 'finished') bumpTour(g.tid); } catch (e) {}
 }
 
 /* ---------- on-device board ---------- */
@@ -2872,9 +2894,10 @@ function localMove(from, to, promo, byBot) {
 function localFinish(res) {
   const L = S.local; if (L.status === 'finished') return; L.status = 'finished'; L.thinking = false; L.result = res.result; L.reason = res.reason; L.finalClocks = localClocks({ ...L, status: 'active' });
   if (L.bot) { const r = res.result === '1/2-1/2' ? 'd' : ((res.result === '1-0') === (L.human === 'w')) ? 'w' : 'l'; saveBotResult(L.bot.id, r); }
+  L.playedAt = now(); L.histId = saveLocalHistory(L);
   if (L.gid) {
     const upd = { status: 'finished', result: res.result, reason: res.reason + ' (played on one device)', finishedAt: now(), moves: L.c.history(), fen: L.c.fen(), ply: L.c.history().length };
-    w(S.db.doc('games/' + L.gid).update(upd)).then(() => toast('Result saved to the tournament.')).catch(() => {});
+    w(S.db.doc('games/' + L.gid).update(upd)).then(() => { toast('Result saved to the tournament.'); bumpTour(L.tid); }).catch(() => {});
   }
   render();
 }
@@ -3097,6 +3120,7 @@ async function runnerTick() {
     const TT = { ...ts.data(), id: ts.id };
     const gs = (await S.db.collection('games').where('tid', '==', TT.id).limit(1000).get()).docs.map(d => ({ ...d.data(), id: d.id }));
     await advance(TT, gs);
+    bumpTour(TT.id);
   } catch (e) { console.warn('runner', e); } finally { runnerBusy = false; }
 }
 async function advance(T, gs) {
@@ -3171,7 +3195,7 @@ function badgeCount() {
 }
 function renderBar() {
   const v = S.route.view; const b = badgeCount();
-  const navv = ['tour', 'create', 'tours'].includes(v) ? 'tours' : ['friends'].includes(v) ? 'friends' : (v === 'bots' || (v === 'local' && S.local && S.local.bot)) ? 'bots' : 'play';
+  const navv = ['tour', 'create', 'tours'].includes(v) ? 'tours' : ['friends'].includes(v) ? 'friends' : (v === 'bots' || (v === 'local' && S.local && S.local.bot && !S.local.histId)) ? 'bots' : 'play';
   const me = S.me;
   const cat = tcCat(S.tc[0], S.tc[1]);
   $('#bar').innerHTML = `
@@ -3380,7 +3404,7 @@ VIEWS.play = {
           </div>
         </section>
         <section class="card stack"><div class="spread"><h2>Play a bot</h2><button class="btn sm" data-act="nav" data-v="bots">All bots</button></div><div class="row" style="gap:14px">${allBots().slice(0, 6).map(b => `<button data-act="bot-pick" data-id="${esc(b.id)}" style="background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:0" title="Play ${esc(b.name)}">${avatar(b.name, b.photo, 54)}<span class="small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:72px">${esc(b.name.split(' ')[0])}</span></button>`).join('')}</div></section>
-        <section class="card"><h2>Your games</h2>${myGamesHTML()}</section>
+        <section class="card"><div class="spread" style="margin-bottom:8px"><h2>Your games</h2><button class="btn sm" data-act="nav" data-v="history">All games</button></div>${myGamesHTML()}</section>
       </div>
       <div class="stack">
         <section class="card"><h2>Invitations</h2>${inboxHTML()}</section>
@@ -3610,19 +3634,38 @@ async function tourAddPlayer(p) {
 
 /* board */
 /* ---------- export: FEN / PGN / Lichess ---------- */
+const pgnDate = ts => { const d = new Date(ts || now()); return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`; };
+function exportFromOnline(g) {
+  const T = g.tid ? S.tournaments.find(t => t.id === g.tid) : null;
+  return { sans: g.moves || [], white: pname(g.white, T), black: pname(g.black, T), result: g.status === 'finished' && g.result && g.result !== '*' ? g.result : '*', tc: `${g.base * 60}+${g.inc}`, event: T ? T.name : 'Club 64 casual game', date: pgnDate(g.finishedAt || g.createdAt), color: g.black === S.uid ? 'black' : 'white' };
+}
+function exportFromLocal(h) {
+  return { sans: h.sans, white: h.names.w, black: h.names.b, result: h.result || '*', tc: h.noClock ? '-' : `${(h.base || 0) * 60}+${h.inc || 0}`, event: h.bot ? `Club 64 vs ${h.bot.name}` : 'Club 64 one-device game', date: pgnDate(h.at), color: h.human === 'b' ? 'black' : 'white' };
+}
 function exportData() {
   const v = S.route.view; const ctx = boardCtx(); if (!ctx) return null;
-  const d = new Date(); const date = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-  if (v === 'game' && S.game) {
-    const g = S.game; const T = g.tid ? S.tournaments.find(t => t.id === g.tid) : null;
-    const fd = g.finishedAt || g.createdAt ? new Date(g.finishedAt || g.createdAt) : d;
-    return { sans: g.moves || [], white: pname(g.white, T), black: pname(g.black, T), result: g.status === 'finished' && g.result && g.result !== '*' ? g.result : '*', tc: `${g.base * 60}+${g.inc}`, event: T ? T.name : 'Club 64 casual game', date: `${fd.getFullYear()}.${String(fd.getMonth() + 1).padStart(2, '0')}.${String(fd.getDate()).padStart(2, '0')}`, fen: ctx.chess.fen(), color: myColor(g) === 'b' ? 'black' : 'white' };
-  }
+  if (v === 'game' && S.game) return { ...exportFromOnline(S.game), fen: ctx.chess.fen() };
   if (v === 'local' && S.local) {
     const L = S.local;
-    return { sans: L.c.history(), white: L.names.w, black: L.names.b, result: L.status === 'finished' && L.result ? L.result : '*', tc: L.noClock ? '-' : `${L.base * 60}+${L.inc}`, event: L.bot ? `Club 64 vs bot` : 'Club 64 one-device game', date, fen: ctx.chess.fen(), color: (L.human || (S.flip ? 'b' : 'w')) === 'b' ? 'black' : 'white' };
+    return { sans: L.c.history(), white: L.names.w, black: L.names.b, result: L.status === 'finished' && L.result ? L.result : '*', tc: L.noClock ? '-' : `${L.base * 60}+${L.inc}`, event: L.bot ? `Club 64 vs ${L.bot.name}` : 'Club 64 one-device game', date: pgnDate(L.playedAt), fen: ctx.chess.fen(), color: (L.human || (S.flip ? 'b' : 'w')) === 'b' ? 'black' : 'white' };
   }
   return null;
+}
+/* saved bot / one-device games (this device) */
+const histKey = () => 'club64-history-' + (S.uid || 'x');
+function localHistory() { try { return JSON.parse(lsGet(histKey()) || '[]') || []; } catch (e) { return []; } }
+function saveLocalHistory(L) {
+  const sans = L.c.history(); if (sans.length < 1 || L.histId) return L.histId || null;
+  const id = 'l' + rid(8); const h = localHistory();
+  h.unshift({ id, sans, names: L.names, result: L.result, reason: L.reason, at: now(), bot: L.bot ? { id: L.bot.id, name: L.bot.name } : null, human: L.human || null, level: L.level, base: L.base, inc: L.inc, noClock: !!L.noClock });
+  lsSet(histKey(), JSON.stringify(h.slice(0, 150))); return id;
+}
+function openLocalGame(h) {
+  const L = newLocal(h.base || 5, h.inc || 0, { names: h.names });
+  for (const m of h.sans) L.c.move(m);
+  Object.assign(L, { status: 'finished', result: h.result, reason: h.reason, started: true, human: h.human, level: h.level || 0, noClock: !!h.noClock, histId: h.id, playedAt: h.at });
+  if (h.bot) { const b = allBots().find(x => x.id === h.bot.id); L.bot = { id: h.bot.id, name: h.bot.name, photo: b ? b.photo : null }; }
+  S.local = L; go('local'); S.flip = h.human === 'b'; render();
 }
 function buildPGN(x) {
   const c = new Chess();
@@ -3633,8 +3676,8 @@ function buildPGN(x) {
   return p;
 }
 function movetext(sans) { let t = ''; sans.forEach((m, i) => { t += (i % 2 === 0 ? `${i / 2 + 1}. ` : '') + m + ' '; }); return t.trim(); }
-function lichessURL(x) {
-  const ply = S.viewPly == null ? x.sans.length : S.viewPly;
+function lichessURL(x, atEnd) {
+  const ply = atEnd || S.viewPly == null ? x.sans.length : S.viewPly;
   return 'https://lichess.org/analysis/pgn/' + encodeURIComponent(movetext(x.sans)) + '?color=' + x.color + '#' + ply;
 }
 function exportHTML(show) {
@@ -3835,6 +3878,38 @@ VIEWS.bots = {
   },
 };
 
+/* all games */
+function histItems() {
+  const online = S.myGames.filter(g => g.status === 'finished' && (g.moves || []).length).map(g => ({ kind: 'online', id: 'g-' + g.id, at: g.finishedAt || g.createdAt || 0, g }));
+  const local = localHistory().map(h => ({ kind: h.bot ? 'bot' : 'device', id: 'l-' + h.id, at: h.at || 0, h }));
+  return [...online, ...local].sort((a, b) => b.at - a.at);
+}
+VIEWS.history = {
+  html() {
+    const f = S.histFilter || 'all';
+    const items = histItems().filter(x => f === 'all' || (f === 'friends' ? x.kind === 'online' : x.kind !== 'online'));
+    const row = x => {
+      let title, sub, out, xp, col;
+      if (x.kind === 'online') {
+        const g = x.g; const T = g.tid ? S.tournaments.find(t => t.id === g.tid) : null; col = g.white === S.uid ? 'w' : 'b';
+        title = 'vs ' + pname(col === 'w' ? g.black : g.white, T); sub = `${fmtTC(g.base, g.inc)}${T ? ' · ' + T.name : ''}`;
+        out = g.result === '1/2-1/2' ? 'Draw' : g.result === '*' ? 'Aborted' : ((g.result === '1-0') === (col === 'w')) ? 'Won' : 'Lost'; xp = exportFromOnline(g);
+      } else {
+        const h = x.h; col = h.human || 'w';
+        title = h.bot ? 'vs ' + h.bot.name : h.names.w + ' vs ' + h.names.b; sub = h.bot ? (h.noClock ? 'No clock' : fmtTC(h.base, h.inc)) : 'One device';
+        out = h.result === '1/2-1/2' ? 'Draw' : !h.human ? (h.result === '1-0' ? 'White won' : h.result === '0-1' ? 'Black won' : 'Draw') : ((h.result === '1-0') === (h.human === 'w')) ? 'Won' : 'Lost'; xp = exportFromLocal(h);
+      }
+      const d = new Date(x.at);
+      return `<div class="hrow"><div class="hmain"><span class="sq-dot ${col}"></span><div class="grow"><div class="t">${esc(title)}</div><div class="small muted">${esc(sub)}</div><div class="small muted">${d.toLocaleDateString(LANG === 'ar' ? 'ar-EG' : undefined, { day: 'numeric', month: 'short', year: 'numeric' })} · ${xp.sans.length} moves</div></div><span class="pill ${out === 'Won' ? 'live' : out === 'Lost' ? 'bad' : 'done'}" style="animation:none">${out}</span></div>
+        <div class="hacts"><button class="btn sm" data-act="hist-view" data-k="${x.id}">View</button><button class="btn sm" data-act="hist-pgn" data-k="${x.id}">Copy PGN</button><a class="btn sm lichess" href="${esc(lichessURL(xp, true))}" target="_blank" rel="noopener">Lichess ↗</a></div></div>`;
+    };
+    return `<div class="stack"><div class="spread"><div><span class="label">History</span><h1>All your games</h1></div><button class="btn sm" data-act="nav" data-v="play">← Play</button></div>
+      <div class="row">${[['all', 'All'], ['friends', 'Vs friends'], ['practice', 'Bots & one device']].map(([k, t]) => `<button class="btn sm ${f === k ? 'dark' : ''}" data-act="hist-filter" data-f="${k}">${t}</button>`).join('')}</div>
+      <section class="card">${items.length ? `<div class="hlist">${items.map(row).join('')}</div>` : `<div class="empty">No finished games yet. Games you finish against friends and bots show up here.</div>`}</section>
+      <p class="small muted">Bot and one-device games are saved on this device only.</p></div>`;
+  },
+};
+
 /* friends */
 VIEWS.friends = {
   html() {
@@ -3898,7 +3973,7 @@ function renderModal() {
       ${m.owner ? `<form id="rs-form" class="stack"><div class="label">Reset a member's password</div><p class="small muted" style="margin:0">Only you see this, as the owner. Use it when a friend forgets their password.</p>
         <input id="rs-user" type="text" placeholder="Their username" autocapitalize="none" required><input id="rs-pw" type="text" placeholder="Temporary password (6+ characters)" required>
         <p class="small" id="rs-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Reset password</button></form>` : ''}
-      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 9</p></div></div>`;
+      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 10</p></div></div>`;
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
       const cur = $('#pw-cur').value, nw = $('#pw-new').value; if (nw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
@@ -3973,7 +4048,7 @@ const ACTIONS = {
   't-startnow': () => { const T = S.tour; confirmBox('Start the tournament now?', `${activeKeys(T).length} players have joined. Pairings are made immediately.`, 'Start now', () => w(S.db.doc('tournaments/' + T.id).update({ startAt: now() - 1000 })).then(() => setTimeout(runnerTick, 300)).catch(() => {})); },
   't-endnow': () => { const T = S.tour; confirmBox('End the arena now?', 'No new games will be paired. Games in progress finish normally.', 'End arena', () => w(S.db.doc('tournaments/' + T.id).update({ endAt: now() })).catch(() => {})); },
   't-cancel': () => { const T = S.tour; confirmBox('Cancel this tournament?', 'It will be marked as cancelled for everyone. This cannot be undone.', 'Cancel tournament', () => w(S.db.doc('tournaments/' + T.id).update({ status: 'cancelled', note: 'Cancelled by the host.', finishedAt: now() })).catch(() => {}), true); },
-  rec: el => { const g = S.tourGames.find(x => x.id === el.dataset.id); if (!g) return; w(S.db.doc('games/' + g.id).update({ status: 'finished', result: el.dataset.r, reason: 'Result entered by ' + (S.me ? S.me.username : 'host'), finishedAt: now() })).then(() => toast('Result saved.')).catch(() => {}); },
+  rec: el => { const g = S.tourGames.find(x => x.id === el.dataset.id); if (!g) return; w(S.db.doc('games/' + g.id).update({ status: 'finished', result: el.dataset.r, reason: 'Result entered by ' + (S.me ? S.me.username : 'host'), finishedAt: now() })).then(() => { toast('Result saved.'); bumpTour(g.tid); }).catch(() => {}); },
   'play-here': el => {
     const g = S.tourGames.find(x => x.id === el.dataset.id) || (S.game && S.game.id === el.dataset.id ? S.game : null); if (!g) return;
     const T = S.tour; S.local = newLocal(g.base, g.inc, { gid: g.id, tid: g.tid, names: { w: pname(g.white, T), b: pname(g.black, T) } }); S.flip = false; go('local');
@@ -3982,6 +4057,9 @@ const ACTIONS = {
   'promo-cancel': () => { S.promo = null; S.sel = null; drawBoard(); },
   lang: () => { LANG = LANG === 'ar' ? 'en' : 'ar'; lsSet('club64-lang', LANG); applyLang(); mountedKey = null; renderNow(); renderModal(); trTree(document.body); toast(LANG === 'ar' ? 'أهلاً بيك! كده إحنا بنتكلم مصري 😎' : 'Switched to English.'); },
   theme: () => { lsSet('club64-theme', curTheme() === 'dark' ? 'light' : 'dark'); applyTheme(); renderBar(); },
+  'hist-filter': el => { S.histFilter = el.dataset.f; render(); },
+  'hist-view': el => { const k = el.dataset.k; if (k.startsWith('g-')) go('game', k.slice(2)); else { const h = localHistory().find(x => x.id === k.slice(2)); if (h) openLocalGame(h); } },
+  'hist-pgn': el => { const k = el.dataset.k; let x = null; if (k.startsWith('g-')) { const g = S.myGames.find(y => y.id === k.slice(2)); if (g) x = exportFromOnline(g); } else { const h = localHistory().find(y => y.id === k.slice(2)); if (h) x = exportFromLocal(h); } if (x) copyText(buildPGN(x), 'PGN copied.', 'PGN'); },
   'copy-fen': () => { const x = exportData(); if (x) copyText(x.fen, 'FEN copied.', 'FEN'); },
   'copy-pgn': () => { const x = exportData(); if (x) copyText(buildPGN(x), 'PGN copied.', 'PGN'); },
   'copy-sel': () => { const t = $('#copy-ta'); if (!t) return; t.select(); try { navigator.clipboard.writeText(t.value).then(() => { toast('Copied.'); S.modal = null; renderModal(); }, () => toast('Press and hold the text, then Copy.')); } catch (e) { toast('Press and hold the text, then Copy.'); } },
