@@ -233,6 +233,15 @@ table.std tr.me td{background:var(--accent-soft)}
 .sq.hint::before{content:"";position:absolute;inset:0;background:rgba(40,120,255,.38)}
 .thinking{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}.thinking i{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 1s infinite}.thinking i:nth-child(2){animation-delay:.2s}.thinking i:nth-child(3){animation-delay:.4s}
 .photo-pick{display:flex;align-items:center;gap:14px}
+/* captured pieces */
+.wcol{display:flex;flex-direction:column;min-width:0;gap:1px}
+.wname{display:flex;align-items:center;gap:8px;min-width:0}
+.wname span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.caps{display:flex;align-items:center;flex-wrap:wrap;min-height:20px;row-gap:2px}
+.capg{display:inline-flex;margin-right:6px}
+.caps .pc{position:relative;inset:auto;display:inline-block;width:20px;height:20px;margin-right:-9px;z-index:auto}
+.capg .pc:last-child{margin-right:0}
+.adv{font-size:.82rem;font-weight:700;color:var(--muted);font-family:var(--f-mono);margin-left:2px}
 
 .pc.wp {
   background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==');
@@ -2206,6 +2215,28 @@ function makeFirebaseDB(fs) {
   const err = e => ({ code: e && e.code === 'permission-denied' ? 'invalid_argument' : (e && e.code) || 'unavailable', message: (e && e.message) || '' });
   const wrapDoc = d => ({ id: d.id, exists: d.exists, data: () => d.exists ? d.data() : undefined, metadata: d.metadata });
   const wrapQ = docs => ({ docs, size: docs.length, empty: !docs.length, docChanges: () => [], metadata: {} });
+  const BASE = `https://firestore.googleapis.com/v1/projects/${FB_CONFIG.projectId}/databases/(default)/documents/`;
+  const toFs = v => { if (v === null || v === undefined) return { nullValue: null }; if (typeof v === 'boolean') return { booleanValue: v }; if (typeof v === 'number') return Number.isSafeInteger(v) ? { integerValue: String(v) } : { doubleValue: v }; if (typeof v === 'string') return { stringValue: v }; if (Array.isArray(v)) return { arrayValue: { values: v.map(toFs) } }; return { mapValue: { fields: Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined).map(([k, x]) => [k, toFs(x)])) } }; };
+  const fromFs = x => { if (!x) return null; if ('nullValue' in x) return null; if ('booleanValue' in x) return x.booleanValue; if ('integerValue' in x) return Number(x.integerValue); if ('doubleValue' in x) return x.doubleValue; if ('stringValue' in x) return x.stringValue; if ('timestampValue' in x) return Date.parse(x.timestampValue); if ('arrayValue' in x) return (x.arrayValue.values || []).map(fromFs); if ('mapValue' in x) return Object.fromEntries(Object.entries(x.mapValue.fields || {}).map(([k, v]) => [k, fromFs(v)])); return null; };
+  async function token() { const u = firebase.auth().currentUser; if (!u) throw { code: 'unauthenticated' }; return u.getIdToken(); }
+  async function restGet(path) {
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 6000);
+    try { const r = await fetch(BASE + path, { headers: { Authorization: 'Bearer ' + await token() }, cache: 'no-store', signal: ctl.signal });
+      if (r.status === 404) return { id: path.split('/').pop(), exists: false, data: () => undefined, metadata: {} };
+      if (!r.ok) throw { code: 'unavailable', message: 'rest ' + r.status };
+      const j = await r.json(); const d = Object.fromEntries(Object.entries(j.fields || {}).map(([k, v]) => [k, fromFs(v)]));
+      return { id: path.split('/').pop(), exists: true, data: () => d, metadata: {} };
+    } finally { clearTimeout(tm); }
+  }
+  async function restPatch(path, data) {
+    const keys = Object.keys(data); const q = keys.map(k => 'updateMask.fieldPaths=' + encodeURIComponent(k)).join('&') + '&currentDocument.exists=true';
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 8000);
+    try { const r = await fetch(BASE + path + '?' + q, { method: 'PATCH', headers: { Authorization: 'Bearer ' + await token(), 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: Object.fromEntries(keys.map(k => [k, toFs(data[k])])) }), signal: ctl.signal });
+      if (r.status === 403) throw { code: 'invalid_argument', message: 'denied' };
+      if (!r.ok) throw { code: 'unavailable', message: 'rest ' + r.status };
+    } finally { clearTimeout(tm); }
+  }
+  window.__fsCodec = { toFs, fromFs };
   async function lease(path, { holder, ttlMs = 30000 }) {
     const ref = fs.doc('leases/' + path.replace(/\//g, '~'));
     try { return await fs.runTransaction(async tx => { const sn = await tx.get(ref); const t = Date.now(); if (sn.exists) { const d = sn.data(); if (d.exp > t && d.holder !== holder) return { acquired: false }; } tx.set(ref, { holder, exp: t + ttlMs }); return { acquired: true }; }); }
@@ -2217,13 +2248,16 @@ function makeFirebaseDB(fs) {
       id: r.id, path,
       async get() { try { return wrapDoc(await r.get()); } catch (e) { throw err(e); } },
       async set(d) { try { await r.set(d); } catch (e) { throw err(e); } },
-      async update(d) { const pairs = flatten(d, [], []); if (!pairs.length) return; const args = []; for (const [p, v] of pairs) args.push(new FP(...p), v); try { await r.update(...args); } catch (e) { throw err(e); } },
+      async update(d) {
+        if (path.startsWith('games/') && !Object.values(d).some(isPlain)) { try { await restPatch(path, d); return; } catch (e) { if (e && e.code === 'invalid_argument') throw e; } }
+        const pairs = flatten(d, [], []); if (!pairs.length) return; const args = []; for (const [p, v] of pairs) args.push(new FP(...p), v); try { await r.update(...args); } catch (e) { throw err(e); } },
       async delete() { try { await r.delete(); } catch (e) { throw err(e); } },
       acquire: o => lease(path, o),
       onSnapshot(next, onErr) {
         let last = null; const deliver = sn => { const w = wrapDoc(sn); const k = JSON.stringify(w.exists ? w.data() : null); if (k === last) return; last = k; next(w); };
         const off = r.onSnapshot(sn => deliver(sn), e => onErr && onErr(err(e)));
-        const poll = /^(games|tournaments)\//.test(path) ? setInterval(() => { if (document.visibilityState === 'hidden') return; r.get({ source: 'server' }).then(deliver).catch(() => {}); }, path.startsWith('games/') ? 2000 : 5000) : null;
+        let busy = false;
+        const poll = /^(games|tournaments)\//.test(path) ? setInterval(() => { if (busy || document.visibilityState === 'hidden') return; busy = true; restGet(path).then(deliver).catch(() => {}).finally(() => { busy = false; }); }, path.startsWith('games/') ? 1500 : 5000) : null;
         return () => { off(); if (poll) clearInterval(poll); };
       },
       collection: sub => collRef(path + '/' + sub),
@@ -3372,7 +3406,25 @@ function movesHTML(sans, curPly) {
   let h = ''; for (let i = 0; i < sans.length; i += 2) h += `<div class="n">${i / 2 + 1}.</div><div class="${i === curPly - 1 ? 'cur' : ''}">${esc(sans[i])}</div><div class="${i + 1 === curPly - 1 ? 'cur' : ''}">${esc(sans[i + 1] || '')}</div>`;
   return `<div class="moves" id="moves">${h}</div>`;
 }
-function pbar(name, sub, clockId, side, av) { return `<div class="pbar"><div class="who">${av || ''}<span class="sq-dot ${side}"></span><span>${esc(name)}</span>${sub ? `<span class="rt">${esc(sub)}</span>` : ''}</div><div class="clock" id="${clockId}">–:––</div></div>`; }
+const PVAL = { p: 1, n: 3, b: 3, r: 5, q: 9 };
+function material(c) {
+  const have = { w: { p: 0, n: 0, b: 0, r: 0, q: 0 }, b: { p: 0, n: 0, b: 0, r: 0, q: 0 } };
+  for (const row of c.board()) for (const x of row) if (x && x.type !== 'k') have[x.color][x.type]++;
+  const start = { p: 8, n: 2, b: 2, r: 2, q: 1 };
+  const took = { w: {}, b: {} }; const pts = { w: 0, b: 0 };
+  for (const side of ['w', 'b']) { const opp = side === 'w' ? 'b' : 'w'; for (const t of ['p', 'n', 'b', 'r', 'q']) took[side][t] = Math.max(0, start[t] - have[opp][t]); }
+  for (const side of ['w', 'b']) for (const t in PVAL) pts[side] += have[side][t] * PVAL[t];
+  return { took, diff: pts.w - pts.b };
+}
+function capsHTML(c, side) {
+  if (!c) return '';
+  const m = material(c); const opp = side === 'w' ? 'b' : 'w';
+  const groups = ['p', 'n', 'b', 'r', 'q'].filter(t => m.took[side][t] > 0).map(t => `<span class="capg">${Array.from({ length: m.took[side][t] }, () => `<i class="pc ${opp}${t}"></i>`).join('')}</span>`).join('');
+  const adv = side === 'w' ? m.diff : -m.diff;
+  if (!groups && adv <= 0) return '<div class="caps"></div>';
+  return `<div class="caps" aria-label="Pieces captured">${groups}${adv > 0 ? `<span class="adv">+${adv}</span>` : ''}</div>`;
+}
+function pbar(name, sub, clockId, side, av, c) { return `<div class="pbar"><div class="who">${av || ''}<span class="sq-dot ${side}"></span><div class="wcol"><div class="wname"><span>${esc(name)}</span>${sub ? `<span class="rt">${esc(sub)}</span>` : ''}</div>${capsHTML(c, side)}</div></div><div class="clock" id="${clockId}">–:––</div></div>`; }
 function resultBlock(result, reason, col) {
   const head = result === '*' ? 'Game aborted' : result === '1/2-1/2' ? 'Draw' : col ? (((result === '1-0') === (col === 'w')) ? 'You won' : 'You lost') : (result === '1-0' ? 'White won' : 'Black won');
   return `<div class="result"><div class="big">${head}</div><div class="mono">${resText(result)}</div><div class="small" style="opacity:.8">${esc(reason || '')}</div></div>`;
@@ -3397,7 +3449,7 @@ VIEWS.game = {
       actions += `<div class="row">${g.ply < 2 && !g.tid ? `<button class="btn" data-act="g-abort">Abort</button>` : `<button class="btn danger" data-act="g-resign-ask">Resign</button>`}${g.drawOffer === col ? '<span class="small muted">Draw offered</span>' : g.ply >= 2 ? `<button class="btn" data-act="g-draw">Offer draw</button>` : ''}<button class="btn" data-act="flip" aria-label="Flip board">Flip</button></div>`;
     } else actions = `<div class="row"><button class="btn" data-act="flip">Flip board</button>${g.manual && g.status === 'active' && (col || (T && T.host === S.uid)) ? `<button class="btn primary" data-act="play-here" data-id="${g.id}">Play on this device</button>` : ''}${!g.tid && g.status === 'finished' && col ? `<button class="btn primary" data-act="rematch">Rematch</button>` : ''}</div>`;
     return `<div class="game">
-      <div class="bcol">${pbar(nm(top), rt(top), 'clk-' + top, top)}<div class="boardwrap ${col && turn === col && g.status === 'active' ? 'mine-turn' : ''}" id="boardwrap">${boardHTML()}</div>${pbar(nm(orient), rt(orient), 'clk-' + orient, orient)}</div>
+      <div class="bcol">${pbar(nm(top), rt(top), 'clk-' + top, top, '', c)}<div class="boardwrap ${col && turn === col && g.status === 'active' ? 'mine-turn' : ''}" id="boardwrap">${boardHTML()}</div>${pbar(nm(orient), rt(orient), 'clk-' + orient, orient, '', c)}</div>
       <aside class="side">
         <div class="spread"><span class="pill mono">${fmtTC(g.base, g.inc)}${g.rated ? ' · rated' : ''}</span>${T ? `<button class="btn sm" data-act="open-tour" data-id="${T.id}">${esc(T.name)} →</button>` : ''}</div>
         ${status}${actions}
@@ -3425,7 +3477,7 @@ VIEWS.local = {
     else actions = `<div class="row">${L.gid ? `<button class="btn primary" data-act="open-tour" data-id="${L.tid}">Back to the tournament</button>` : B ? `<button class="btn primary" data-act="bot-again">Play ${esc(B.name.split(' ')[0])} again</button><button class="btn" data-act="nav" data-v="bots">All bots</button>` : `<button class="btn primary" data-act="practice">New game</button>`}<button class="btn" data-act="flip">Flip</button></div>`;
     const label = B ? `${L.noClock ? 'No clock' : fmtTC(L.base, L.inc)} · vs bot` : `${fmtTC(L.base, L.inc)} · one device`;
     return `<div class="game">
-      <div class="bcol">${pbar(L.names[top], sub(top), 'clk-' + top, top, av(top))}<div class="boardwrap mine-turn" id="boardwrap">${boardHTML()}</div>${pbar(L.names[orient], sub(orient), 'clk-' + orient, orient, av(orient))}</div>
+      <div class="bcol">${pbar(L.names[top], sub(top), 'clk-' + top, top, av(top), L.c)}<div class="boardwrap mine-turn" id="boardwrap">${boardHTML()}</div>${pbar(L.names[orient], sub(orient), 'clk-' + orient, orient, av(orient), L.c)}</div>
       <aside class="side"><div class="spread"><span class="pill mono">${label}</span>${L.tid ? `<button class="btn sm" data-act="open-tour" data-id="${L.tid}">Tournament →</button>` : ''}</div>
         ${status}${actions}
         ${movesHTML(L.c.history(), L.c.history().length)}
@@ -3509,7 +3561,7 @@ function renderModal() {
       ${m.owner ? `<form id="rs-form" class="stack"><div class="label">Reset a member's password</div><p class="small muted" style="margin:0">Only you see this, as the owner. Use it when a friend forgets their password.</p>
         <input id="rs-user" type="text" placeholder="Their username" autocapitalize="none" required><input id="rs-pw" type="text" placeholder="Temporary password (6+ characters)" required>
         <p class="small" id="rs-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Reset password</button></form>` : ''}
-      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 2</p></div></div>`;
+      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 4</p></div></div>`;
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
       const cur = $('#pw-cur').value, nw = $('#pw-new').value; if (nw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
