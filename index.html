@@ -262,6 +262,10 @@ html[lang=ar] .label{letter-spacing:0}
 [dir=rtl] .pair .w{text-align:right}
 [dir=rtl] .sq .co.r{left:3px;right:auto}
 #moves{position:relative}
+.exp{display:flex;flex-direction:column;gap:6px}
+.exprow{display:flex;flex-wrap:wrap;gap:6px}
+.btn.lichess{background:#2b2b2b;border-color:#2b2b2b;color:#fff}
+.copyta{width:100%;font:500 .85rem/1.45 var(--f-mono);padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);resize:vertical;direction:ltr}
 [dir=rtl] .adv,[dir=rtl] .pill.mono{direction:ltr;unicode-bidi:isolate}
 [dir=rtl] .rvboard,[dir=rtl] .rvgraph,[dir=rtl] #rvmoves,[dir=rtl] .rvtable .rvn{direction:ltr}
 
@@ -2255,6 +2259,9 @@ const AR = {
   "You're using the offline version. Everything is saved on this device only. You can run in-person tournaments with player names and play on one shared screen. To play friends online, open the": 'إنت شغال على النسخة الأوفلاين، وكل حاجة متخزنة على الجهاز ده بس. تقدر تعمل بطولات وش لوش بأسماء اللعيبة وتلعبوا على شاشة واحدة. عشان تلعب مع صحابك أونلاين، افتح',
   "You're using the offline version. Everything is saved on this device only. You can run in-person tournaments with player names and play on one shared screen.": 'إنت شغال على النسخة الأوفلاين، وكل حاجة متخزنة على الجهاز ده بس. تقدر تعمل بطولات وش لوش بأسماء اللعيبة وتلعبوا على شاشة واحدة.',
   'online Club 64': 'Club 64 الأونلاين',
+  'Analyze this game': 'حلّل الماتش ده', 'Copy FEN': 'انسخ الـ FEN', 'Copy PGN': 'انسخ الـ PGN', 'Open in Lichess ↗': 'افتحه في ليتشس ↗',
+  'FEN copied.': 'الـ FEN اتنسخ ✔', 'PGN copied.': 'الـ PGN اتنسخ ✔', 'Copied.': 'اتنسخ ✔', 'Copy': 'انسخ', 'Close': 'اقفل', 'Copy FEN?': 'انسخ الـ FEN', 'Copy PGN?': 'انسخ الـ PGN',
+  'Press and hold the text, then Copy.': 'دوس مطوّل على الكلام واختار نسخ.',
   // game review
   'Game review': 'تحليل الماتش', '★ Game Review': '★ حلّل الماتش', 'Review': 'حلّل', '← Back': '← ارجع',
   'Starting position': 'أول الماتش', 'Use the arrows or tap a move to step through the game.': 'استخدم الأسهم أو دوس على أي نقلة وامشي في الماتش خطوة خطوة.',
@@ -3602,6 +3609,43 @@ async function tourAddPlayer(p) {
 }
 
 /* board */
+/* ---------- export: FEN / PGN / Lichess ---------- */
+function exportData() {
+  const v = S.route.view; const ctx = boardCtx(); if (!ctx) return null;
+  const d = new Date(); const date = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+  if (v === 'game' && S.game) {
+    const g = S.game; const T = g.tid ? S.tournaments.find(t => t.id === g.tid) : null;
+    const fd = g.finishedAt || g.createdAt ? new Date(g.finishedAt || g.createdAt) : d;
+    return { sans: g.moves || [], white: pname(g.white, T), black: pname(g.black, T), result: g.status === 'finished' && g.result && g.result !== '*' ? g.result : '*', tc: `${g.base * 60}+${g.inc}`, event: T ? T.name : 'Club 64 casual game', date: `${fd.getFullYear()}.${String(fd.getMonth() + 1).padStart(2, '0')}.${String(fd.getDate()).padStart(2, '0')}`, fen: ctx.chess.fen(), color: myColor(g) === 'b' ? 'black' : 'white' };
+  }
+  if (v === 'local' && S.local) {
+    const L = S.local;
+    return { sans: L.c.history(), white: L.names.w, black: L.names.b, result: L.status === 'finished' && L.result ? L.result : '*', tc: L.noClock ? '-' : `${L.base * 60}+${L.inc}`, event: L.bot ? `Club 64 vs bot` : 'Club 64 one-device game', date, fen: ctx.chess.fen(), color: (L.human || (S.flip ? 'b' : 'w')) === 'b' ? 'black' : 'white' };
+  }
+  return null;
+}
+function buildPGN(x) {
+  const c = new Chess();
+  c.header('Event', x.event, 'Site', 'Club 64', 'Date', x.date, 'White', x.white, 'Black', x.black, 'Result', x.result, 'TimeControl', x.tc);
+  for (const m of x.sans) c.move(m);
+  let p = c.pgn({ max_width: 80, newline_char: '\n' });
+  if (!/(1-0|0-1|1\/2-1\/2|\*)\s*$/.test(p)) p += ' ' + x.result;
+  return p;
+}
+function movetext(sans) { let t = ''; sans.forEach((m, i) => { t += (i % 2 === 0 ? `${i / 2 + 1}. ` : '') + m + ' '; }); return t.trim(); }
+function lichessURL(x) {
+  const ply = S.viewPly == null ? x.sans.length : S.viewPly;
+  return 'https://lichess.org/analysis/pgn/' + encodeURIComponent(movetext(x.sans)) + '?color=' + x.color + '#' + ply;
+}
+function exportHTML(show) {
+  if (!show) return '';
+  const x = exportData(); if (!x) return '';
+  return `<div class="exp"><div class="label">Analyze this game</div><div class="exprow"><button class="btn sm" data-act="copy-fen">Copy FEN</button><button class="btn sm" data-act="copy-pgn">Copy PGN</button><a class="btn sm lichess" href="${esc(lichessURL(x))}" target="_blank" rel="noopener">Open in Lichess ↗</a></div></div>`;
+}
+function copyText(text, okMsg, title) {
+  const fallback = () => { S.modal = { type: 'copy', title, text }; renderModal(); };
+  try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(() => toast(okMsg), fallback); else fallback(); } catch (e) { fallback(); }
+}
 let vcache = { k: null, c: null };
 function viewChess(full) {
   const sans = full.history(); const total = sans.length;
@@ -3746,6 +3790,7 @@ VIEWS.game = {
         ${status}${actions}
         <div id="resign-confirm"></div>
         ${movesHTML(g.moves || [])}
+        ${exportHTML(g.status === 'finished' && (g.moves || []).length > 0)}
         ${g.status === 'finished' && T && T.status === 'running' ? `<button class="btn primary" data-act="open-tour" data-id="${T.id}">Back to the tournament</button>` : ''}
       </aside></div>`;
   },
@@ -3772,6 +3817,7 @@ VIEWS.local = {
       <aside class="side"><div class="spread"><span class="pill mono">${label}</span>${L.tid ? `<button class="btn sm" data-act="open-tour" data-id="${L.tid}">Tournament →</button>` : ''}</div>
         ${status}${actions}
         ${movesHTML(L.c.history())}
+        ${exportHTML(L.c.history().length > 0 && (L.status === 'finished' || !L.gid))}
       </aside></div>`;
   },
   mount() { bindBoard(); const mv = $('#moves'); if (mv) { if (viewing()) keepCur('#moves'); else mv.scrollTop = mv.scrollHeight; } },
@@ -3852,7 +3898,7 @@ function renderModal() {
       ${m.owner ? `<form id="rs-form" class="stack"><div class="label">Reset a member's password</div><p class="small muted" style="margin:0">Only you see this, as the owner. Use it when a friend forgets their password.</p>
         <input id="rs-user" type="text" placeholder="Their username" autocapitalize="none" required><input id="rs-pw" type="text" placeholder="Temporary password (6+ characters)" required>
         <p class="small" id="rs-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Reset password</button></form>` : ''}
-      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 8</p></div></div>`;
+      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 9</p></div></div>`;
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
       const cur = $('#pw-cur').value, nw = $('#pw-new').value; if (nw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
@@ -3868,6 +3914,10 @@ function renderModal() {
         await setPassword(u.data().uid, pw); out.style.color = 'var(--good)'; out.textContent = `Done. Tell ${$('#rs-user').value.trim()} to log in with the temporary password and change it.`; } catch (e2) { out.textContent = "Couldn't reset the password."; }
     });
     return;
+  }
+  if (m.type === 'copy') {
+    root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="Copy ${esc(m.title)}"><h2>Copy ${esc(m.title)}</h2><textarea id="copy-ta" readonly rows="${m.title === 'PGN' ? 10 : 3}" class="copyta">${esc(m.text)}</textarea><div class="row"><button class="btn primary" data-act="copy-sel">Copy</button><button class="btn" data-act="modal-close">Close</button></div></div></div>`;
+    setTimeout(() => { const t = $('#copy-ta'); if (t) { t.focus(); t.select(); } }, 30); return;
   }
   if (m.type === 'confirm') root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog"><h2>${esc(m.title)}</h2><p class="muted">${esc(m.body)}</p><div class="row"><button class="btn ${m.danger ? 'dark' : 'primary'}" data-act="confirm-yes">${esc(m.yes)}</button><button class="btn" data-act="modal-close">Keep it</button></div></div></div>`;
 }
@@ -3932,6 +3982,9 @@ const ACTIONS = {
   'promo-cancel': () => { S.promo = null; S.sel = null; drawBoard(); },
   lang: () => { LANG = LANG === 'ar' ? 'en' : 'ar'; lsSet('club64-lang', LANG); applyLang(); mountedKey = null; renderNow(); renderModal(); trTree(document.body); toast(LANG === 'ar' ? 'أهلاً بيك! كده إحنا بنتكلم مصري 😎' : 'Switched to English.'); },
   theme: () => { lsSet('club64-theme', curTheme() === 'dark' ? 'light' : 'dark'); applyTheme(); renderBar(); },
+  'copy-fen': () => { const x = exportData(); if (x) copyText(x.fen, 'FEN copied.', 'FEN'); },
+  'copy-pgn': () => { const x = exportData(); if (x) copyText(buildPGN(x), 'PGN copied.', 'PGN'); },
+  'copy-sel': () => { const t = $('#copy-ta'); if (!t) return; t.select(); try { navigator.clipboard.writeText(t.value).then(() => { toast('Copied.'); S.modal = null; renderModal(); }, () => toast('Press and hold the text, then Copy.')); } catch (e) { toast('Press and hold the text, then Copy.'); } },
   'mv-first': () => mvSet(0),
   'mv-prev': () => mvSet((S.viewPly == null ? mvTotal() : S.viewPly) - 1),
   'mv-next': () => mvSet((S.viewPly == null ? mvTotal() : S.viewPly) + 1),
