@@ -242,6 +242,12 @@ table.std tr.me td{background:var(--accent-soft)}
 .caps .pc{position:relative;inset:auto;display:inline-block;width:20px;height:20px;margin-right:-9px;z-index:auto}
 .capg .pc:last-child{margin-right:0}
 .adv{font-size:.82rem;font-weight:700;color:var(--muted);font-family:var(--f-mono);margin-left:2px}
+/* move browsing */
+.mvnav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.mvnav .btn{padding:8px 0;font-size:1rem}
+.mvnote{font-size:.82rem;color:var(--warn);font-weight:600;margin-top:-4px}
+.moves .mv[data-act]{cursor:pointer}
+.moves .mv[data-act]:hover{background:var(--surface-2)}
 
 .pc.wp {
   background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==');
@@ -2399,7 +2405,7 @@ async function applyRatings() {
 
 /* ---------- routing ---------- */
 function go(view, id) {
-  S.route = { view, id }; S.sel = null; S.promo = null; S.viewRound = null;
+  S.route = { view, id }; S.sel = null; S.promo = null; S.viewRound = null; S.viewPly = null;
   if (view !== 'game') S.flip = false;
   try {
     const h = view === 'tour' ? '#t-' + id : view === 'game' ? '#g-' + id : '#' + view;
@@ -3331,16 +3337,25 @@ async function tourAddPlayer(p) {
 }
 
 /* board */
+let vcache = { k: null, c: null };
+function viewChess(full) {
+  const sans = full.history(); const total = sans.length;
+  if (S.viewPly == null || S.viewPly >= total) { S.viewPly = null; return full; }
+  const p = Math.max(0, S.viewPly); const k = sans.slice(0, p).join(' ') + '|' + p;
+  if (vcache.k !== k) { const c = new Chess(); for (let i = 0; i < p; i++) c.move(sans[i]); vcache = { k, c }; }
+  return vcache.c;
+}
+const viewing = () => S.viewPly != null;
 function boardCtx() {
   const v = S.route.view;
   if (v === 'local' && S.local) {
-    const L = S.local; const h = L.c.history({ verbose: true }); const lm = h[h.length - 1];
-    return { chess: L.c, orientation: S.flip ? 'b' : 'w', movable: col => L.status === 'active' && L.c.turn() === col && (!L.bot || (col === L.human && !L.thinking)), onMove: localMove, last: lm };
+    const L = S.local; const vc = viewChess(L.c); const h = vc.history({ verbose: true }); const lm = h[h.length - 1];
+    return { chess: vc, orientation: S.flip ? 'b' : 'w', movable: col => !viewing() && L.status === 'active' && L.c.turn() === col && (!L.bot || (col === L.human && !L.thinking)), onMove: localMove, last: lm };
   }
   if (v === 'game' && S.game) {
-    const g = S.game; const c = chessFor(g); const col = myColor(g); const h = c.history({ verbose: true }); const lm = h[h.length - 1];
+    const g = S.game; const c = chessFor(g); const vc = viewChess(c); const col = myColor(g); const h = vc.history({ verbose: true }); const lm = h[h.length - 1];
     const orient = (col === 'b') !== S.flip ? 'b' : 'w';
-    return { chess: c, orientation: orient, movable: pc => !g.manual && g.status === 'active' && col === pc && c.turn() === col, onMove: onlineMove, last: lm };
+    return { chess: vc, orientation: orient, movable: pc => !viewing() && !g.manual && g.status === 'active' && col === pc && c.turn() === col, onMove: onlineMove, last: lm };
   }
   return null;
 }
@@ -3376,6 +3391,7 @@ function bindBoard() {
   const bw = $('#boardwrap'); if (!bw || bw.dataset.bound) return; bw.dataset.bound = '1';
   bw.addEventListener('pointerdown', e => {
     if (S.promo) return;
+    if (viewing()) { mvSet(mvTotal()); return; }
     const el = e.target.closest('[data-sq]'); if (!el) return; const sq = el.dataset.sq; const ctx = boardCtx(); if (!ctx) return;
     const p = ctx.chess.get(sq);
     if (S.sel && S.sel !== sq && ctx.chess.moves({ square: S.sel, verbose: true }).some(m => m.to === sq)) { tryMove(S.sel, sq); return; }
@@ -3401,11 +3417,20 @@ function bindBoard() {
   };
   bw.addEventListener('pointerup', end); bw.addEventListener('pointercancel', end);
 }
-function movesHTML(sans, curPly) {
-  if (!sans.length) return `<div class="empty small">No moves yet.</div>`;
-  let h = ''; for (let i = 0; i < sans.length; i += 2) h += `<div class="n">${i / 2 + 1}.</div><div class="${i === curPly - 1 ? 'cur' : ''}">${esc(sans[i])}</div><div class="${i + 1 === curPly - 1 ? 'cur' : ''}">${esc(sans[i + 1] || '')}</div>`;
-  return `<div class="moves" id="moves">${h}</div>`;
+function movesHTML(sans) {
+  const total = sans.length; const cur = S.viewPly == null ? total : S.viewPly;
+  const nav = `<div class="mvnav" role="group" aria-label="Browse moves">
+    <button class="btn" data-act="mv-first" ${cur === 0 ? 'disabled' : ''} aria-label="First move" title="First move">⏮</button>
+    <button class="btn" data-act="mv-prev" ${cur === 0 ? 'disabled' : ''} aria-label="Previous move" title="Previous move (←)">◀</button>
+    <button class="btn" data-act="mv-next" ${cur >= total ? 'disabled' : ''} aria-label="Next move" title="Next move (→)">▶</button>
+    <button class="btn ${viewing() ? 'primary' : ''}" data-act="mv-last" ${cur >= total ? 'disabled' : ''} aria-label="Back to the current position" title="Current position">⏭</button></div>
+    ${viewing() ? `<div class="mvnote">Viewing move ${cur} of ${total}. Tap ⏭ or the board to return to the game.</div>` : ''}`;
+  if (!total) return `${nav}<div class="empty small">No moves yet.</div>`;
+  let h = ''; for (let i = 0; i < total; i += 2) h += `<div class="n">${i / 2 + 1}.</div><div class="mv ${i === cur - 1 ? 'cur' : ''}" data-act="mv-go" data-p="${i + 1}">${esc(sans[i])}</div><div class="mv ${i + 1 === cur - 1 ? 'cur' : ''}" ${sans[i + 1] ? `data-act="mv-go" data-p="${i + 2}"` : ''}>${esc(sans[i + 1] || '')}</div>`;
+  return `${nav}<div class="moves" id="moves">${h}</div>`;
 }
+function mvTotal() { if (S.route.view === 'local' && S.local) return S.local.c.history().length; if (S.route.view === 'game' && S.game) return (S.game.moves || []).length; return 0; }
+function mvSet(p) { const t = mvTotal(); p = Math.max(0, Math.min(t, p)); S.viewPly = p >= t ? null : p; S.sel = null; S.promo = null; mountedKey = null; renderNow(); const cur = document.querySelector('#moves .cur'); if (cur) cur.scrollIntoView({ block: 'nearest' }); }
 const PVAL = { p: 1, n: 3, b: 3, r: 5, q: 9 };
 function material(c) {
   const have = { w: { p: 0, n: 0, b: 0, r: 0, q: 0 }, b: { p: 0, n: 0, b: 0, r: 0, q: 0 } };
@@ -3449,16 +3474,16 @@ VIEWS.game = {
       actions += `<div class="row">${g.ply < 2 && !g.tid ? `<button class="btn" data-act="g-abort">Abort</button>` : `<button class="btn danger" data-act="g-resign-ask">Resign</button>`}${g.drawOffer === col ? '<span class="small muted">Draw offered</span>' : g.ply >= 2 ? `<button class="btn" data-act="g-draw">Offer draw</button>` : ''}<button class="btn" data-act="flip" aria-label="Flip board">Flip</button></div>`;
     } else actions = `<div class="row"><button class="btn" data-act="flip">Flip board</button>${g.manual && g.status === 'active' && (col || (T && T.host === S.uid)) ? `<button class="btn primary" data-act="play-here" data-id="${g.id}">Play on this device</button>` : ''}${!g.tid && g.status === 'finished' && col ? `<button class="btn primary" data-act="rematch">Rematch</button>` : ''}</div>`;
     return `<div class="game">
-      <div class="bcol">${pbar(nm(top), rt(top), 'clk-' + top, top, '', c)}<div class="boardwrap ${col && turn === col && g.status === 'active' ? 'mine-turn' : ''}" id="boardwrap">${boardHTML()}</div>${pbar(nm(orient), rt(orient), 'clk-' + orient, orient, '', c)}</div>
+      <div class="bcol">${pbar(nm(top), rt(top), 'clk-' + top, top, '', viewChess(c))}<div class="boardwrap ${col && turn === col && g.status === 'active' ? 'mine-turn' : ''}" id="boardwrap">${boardHTML()}</div>${pbar(nm(orient), rt(orient), 'clk-' + orient, orient, '', viewChess(c))}</div>
       <aside class="side">
         <div class="spread"><span class="pill mono">${fmtTC(g.base, g.inc)}${g.rated ? ' · rated' : ''}</span>${T ? `<button class="btn sm" data-act="open-tour" data-id="${T.id}">${esc(T.name)} →</button>` : ''}</div>
         ${status}${actions}
         <div id="resign-confirm"></div>
-        ${movesHTML(g.moves || [], g.ply)}
+        ${movesHTML(g.moves || [])}
         ${g.status === 'finished' && T && T.status === 'running' ? `<button class="btn primary" data-act="open-tour" data-id="${T.id}">Back to the tournament</button>` : ''}
       </aside></div>`;
   },
-  mount() { bindBoard(); const mv = $('#moves'); if (mv) mv.scrollTop = mv.scrollHeight; },
+  mount() { bindBoard(); const mv = $('#moves'); if (mv) { const cur = mv.querySelector('.cur'); if (viewing() && cur) cur.scrollIntoView({ block: 'nearest' }); else mv.scrollTop = mv.scrollHeight; } },
 };
 VIEWS.local = {
   html() {
@@ -3477,13 +3502,13 @@ VIEWS.local = {
     else actions = `<div class="row">${L.gid ? `<button class="btn primary" data-act="open-tour" data-id="${L.tid}">Back to the tournament</button>` : B ? `<button class="btn primary" data-act="bot-again">Play ${esc(B.name.split(' ')[0])} again</button><button class="btn" data-act="nav" data-v="bots">All bots</button>` : `<button class="btn primary" data-act="practice">New game</button>`}<button class="btn" data-act="flip">Flip</button></div>`;
     const label = B ? `${L.noClock ? 'No clock' : fmtTC(L.base, L.inc)} · vs bot` : `${fmtTC(L.base, L.inc)} · one device`;
     return `<div class="game">
-      <div class="bcol">${pbar(L.names[top], sub(top), 'clk-' + top, top, av(top), L.c)}<div class="boardwrap mine-turn" id="boardwrap">${boardHTML()}</div>${pbar(L.names[orient], sub(orient), 'clk-' + orient, orient, av(orient), L.c)}</div>
+      <div class="bcol">${pbar(L.names[top], sub(top), 'clk-' + top, top, av(top), viewChess(L.c))}<div class="boardwrap mine-turn" id="boardwrap">${boardHTML()}</div>${pbar(L.names[orient], sub(orient), 'clk-' + orient, orient, av(orient), viewChess(L.c))}</div>
       <aside class="side"><div class="spread"><span class="pill mono">${label}</span>${L.tid ? `<button class="btn sm" data-act="open-tour" data-id="${L.tid}">Tournament →</button>` : ''}</div>
         ${status}${actions}
-        ${movesHTML(L.c.history(), L.c.history().length)}
+        ${movesHTML(L.c.history())}
       </aside></div>`;
   },
-  mount() { bindBoard(); const mv = $('#moves'); if (mv) mv.scrollTop = mv.scrollHeight; },
+  mount() { bindBoard(); const mv = $('#moves'); if (mv) { const cur = mv.querySelector('.cur'); if (viewing() && cur) cur.scrollIntoView({ block: 'nearest' }); else mv.scrollTop = mv.scrollHeight; } },
 };
 
 /* bots */
@@ -3561,7 +3586,7 @@ function renderModal() {
       ${m.owner ? `<form id="rs-form" class="stack"><div class="label">Reset a member's password</div><p class="small muted" style="margin:0">Only you see this, as the owner. Use it when a friend forgets their password.</p>
         <input id="rs-user" type="text" placeholder="Their username" autocapitalize="none" required><input id="rs-pw" type="text" placeholder="Temporary password (6+ characters)" required>
         <p class="small" id="rs-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Reset password</button></form>` : ''}
-      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 4</p></div></div>`;
+      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 5</p></div></div>`;
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
       const cur = $('#pw-cur').value, nw = $('#pw-new').value; if (nw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
@@ -3639,6 +3664,11 @@ const ACTIONS = {
   },
   promo: el => { const p = S.promo; S.promo = null; S.sel = null; const ctx = boardCtx(); if (ctx && p) ctx.onMove(p.from, p.to, el.dataset.t); drawBoard(); },
   'promo-cancel': () => { S.promo = null; S.sel = null; drawBoard(); },
+  'mv-first': () => mvSet(0),
+  'mv-prev': () => mvSet((S.viewPly == null ? mvTotal() : S.viewPly) - 1),
+  'mv-next': () => mvSet((S.viewPly == null ? mvTotal() : S.viewPly) + 1),
+  'mv-last': () => mvSet(mvTotal()),
+  'mv-go': el => mvSet(+el.dataset.p),
   flip: () => { S.flip = !S.flip; render(); },
   'g-resign-ask': () => confirmBox('Resign this game?', 'Your opponent gets the win.', 'Resign', () => { const g = S.game; const col = myColor(g); gameUpdate({ status: 'finished', result: col === 'w' ? '0-1' : '1-0', reason: (col === 'w' ? 'White' : 'Black') + ' resigned', finishedAt: now(), drawOffer: null }); }, true),
   'g-abort': () => gameUpdate({ status: 'finished', result: '*', reason: 'Aborted before the first moves', finishedAt: now() }),
@@ -3689,6 +3719,15 @@ document.addEventListener('input', e => {
   else if (pfx === 'cftc') { S.draft.tc = [b, i]; VIEWS.create.refresh(); }
   else if (k === 'ba-name' && S.modal) { S.modal.name = e.target.value; }
   else if (pfx === 'mtc' && S.modal) { S.modal.tc = [b, i]; const btn = document.querySelector('[data-act="ch-send"]'); if (btn) btn.textContent = 'Send challenge · ' + fmtTC(b, i); document.querySelectorAll('[data-act="mtc"]').forEach(x => x.setAttribute('aria-pressed', String(+x.dataset.b === b && +x.dataset.i === i))); }
+});
+document.addEventListener('keydown', e => {
+  if (!['game', 'local'].includes(S.route.view) || S.modal) return;
+  const tg = e.target; if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT')) return;
+  const cur = S.viewPly == null ? mvTotal() : S.viewPly;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); mvSet(cur - 1); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); mvSet(cur + 1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); mvSet(0); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); mvSet(mvTotal()); }
 });
 window.addEventListener('hashchange', () => { const r = routeFromHash(); if (r.view !== S.route.view || r.id !== S.route.id) go(r.view, r.id); });
 
