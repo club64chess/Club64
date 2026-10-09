@@ -2220,7 +2220,12 @@ function makeFirebaseDB(fs) {
       async update(d) { const pairs = flatten(d, [], []); if (!pairs.length) return; const args = []; for (const [p, v] of pairs) args.push(new FP(...p), v); try { await r.update(...args); } catch (e) { throw err(e); } },
       async delete() { try { await r.delete(); } catch (e) { throw err(e); } },
       acquire: o => lease(path, o),
-      onSnapshot(next, onErr) { return r.onSnapshot(sn => next(wrapDoc(sn)), e => onErr && onErr(err(e))); },
+      onSnapshot(next, onErr) {
+        let last = null; const deliver = sn => { const w = wrapDoc(sn); const k = JSON.stringify(w.exists ? w.data() : null); if (k === last) return; last = k; next(w); };
+        const off = r.onSnapshot(sn => deliver(sn), e => onErr && onErr(err(e)));
+        const poll = /^(games|tournaments)\//.test(path) ? setInterval(() => { if (document.visibilityState === 'hidden') return; r.get({ source: 'server' }).then(deliver).catch(() => {}); }, path.startsWith('games/') ? 2000 : 5000) : null;
+        return () => { off(); if (poll) clearInterval(poll); };
+      },
       collection: sub => collRef(path + '/' + sub),
     };
   }
@@ -2233,7 +2238,12 @@ function makeFirebaseDB(fs) {
       orderBy: (f, d = 'asc') => collRef(path, { ...q, o: [f, d] }),
       limit: n => collRef(path, { ...q, l: n }),
       async get() { try { return post((await build().get()).docs); } catch (e) { throw err(e); } },
-      onSnapshot(next, onErr) { return build().onSnapshot(sn => next(post(sn.docs)), e => onErr && onErr(err(e))); },
+      onSnapshot(next, onErr) {
+        let last = null; const deliver = docs => { const p = post(docs); const k = JSON.stringify(p.docs.map(d => [d.id, d.data()])); if (k === last) return; last = k; next(p); };
+        const off = build().onSnapshot(sn => deliver(sn.docs), e => onErr && onErr(err(e)));
+        const poll = ['games', 'invites'].includes(path) ? setInterval(() => { if (document.visibilityState === 'hidden') return; build().get({ source: 'server' }).then(sn => deliver(sn.docs)).catch(() => {}); }, 6000) : null;
+        return () => { off(); if (poll) clearInterval(poll); };
+      },
       doc: id => docRef(path + '/' + (id || rid(16))),
       async add(d) { const r = docRef(path + '/' + rid(16)); await r.set(d); return r; },
     };
@@ -2261,7 +2271,7 @@ async function initBackend() {
   if (FB) {
     try {
       const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(FB_CONFIG);
-      const fs = firebase.firestore(); try { fs.settings({ ignoreUndefinedProperties: true, merge: true }); } catch (e) {}
+      const fs = firebase.firestore(); try { fs.settings({ ignoreUndefinedProperties: true, experimentalForceLongPolling: true, merge: true }); } catch (e) { try { fs.settings({ ignoreUndefinedProperties: true, merge: true }); } catch (e2) {} }
       S.mode = 'online'; S.fb = true; S.db = makeFirebaseDB(fs); S.auth = firebase.auth();
       S.fbUser = await new Promise(res => { const off = S.auth.onAuthStateChanged(u => { off(); res(u); }); });
       S.cid = S.fbUser ? S.fbUser.uid : null;
@@ -2951,14 +2961,19 @@ async function doSignup(raw, pw, pw2, code) {
   if (pw.length < 6) return 'Use a password of at least 6 characters.';
   if (pw !== pw2) return "The two passwords don't match.";
   if (S.fb) {
+    code = String(code || '').trim().toLowerCase().replace(/[\u2010-\u2015\u2212]/g, '-').replace(/\s+/g, '');
     if (!code) return 'Enter the club code you got from Islam.';
     const ex = await S.db.doc('usernames/' + lower).get().catch(() => null); if (ex && ex.exists) return 'That username is taken. Try another.';
     let cred;
     try { cred = await S.auth.createUserWithEmailAndPassword(FB_EMAIL(lower), pw); }
     catch (e) { const c = e && e.code || ''; if (c.includes('email-already-in-use')) return 'That username is taken. Try another.'; if (c.includes('weak-password')) return 'Use a password of at least 6 characters.'; return "Couldn't create the account. Check your internet and try again."; }
     const uid = cred.user.uid;
-    try { await S.db.doc('profiles/' + uid).set({ username: raw, lower, createdAt: now(), ratings: { bullet: 1500, blitz: 1500, rapid: 1500, classical: 1500 }, applied: [], games: 0, joinCode: code.trim() }); }
-    catch (e) { try { await cred.user.delete(); } catch (e2) {} return "That club code isn't right. Ask Islam for the code."; }
+    try { await S.db.doc('profiles/' + uid).set({ username: raw, lower, createdAt: now(), ratings: { bullet: 1500, blitz: 1500, rapid: 1500, classical: 1500 }, applied: [], games: 0, joinCode: code }); }
+    catch (e) { console.warn('profile create', e); try { await cred.user.delete(); } catch (e2) {}
+      const c = (e && e.code) || '';
+      if (c === 'invalid_argument') return "Firebase refused the account. Either the club code is wrong, or the database rules haven't been published yet.";
+      if (c.includes('not-found') || c.includes('failed-precondition')) return "The database isn't set up yet. Create the Firestore database in Firebase first.";
+      return "Couldn't save the account (" + (c || 'unknown error') + "). Check your internet and try again."; }
     try { await S.db.doc('usernames/' + lower).set({ uid, at: now() }); } catch (e) {}
     signIn(uid); toast('Welcome to Club 64, ' + raw + '.'); return null;
   }
@@ -3494,7 +3509,7 @@ function renderModal() {
       ${m.owner ? `<form id="rs-form" class="stack"><div class="label">Reset a member's password</div><p class="small muted" style="margin:0">Only you see this, as the owner. Use it when a friend forgets their password.</p>
         <input id="rs-user" type="text" placeholder="Their username" autocapitalize="none" required><input id="rs-pw" type="text" placeholder="Temporary password (6+ characters)" required>
         <p class="small" id="rs-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Reset password</button></form>` : ''}
-      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div></div></div>`;
+      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 2</p></div></div>`;
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
       const cur = $('#pw-cur').value, nw = $('#pw-new').value; if (nw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
