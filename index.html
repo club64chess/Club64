@@ -196,6 +196,7 @@ table.std tr.me td{background:var(--accent-soft)}
 
 /* modal + toast */
 .modal{position:fixed;inset:0;z-index:50;background:rgba(8,12,18,.5);display:grid;place-items:center;padding:16px}
+.chead .btn.sm{flex:none}@media (max-width:700px){.hide-sm{display:none}}
 .dzone{border:1px solid var(--line, rgba(0,0,0,.12));border-radius:10px;padding:10px 12px}.dzone summary{cursor:pointer;color:var(--bad);font-weight:700}.dzone[open] summary{margin-bottom:10px}
 .modal-in{background:var(--surface);border-radius:14px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:min(92vw,520px);box-shadow:var(--shadow)}
@@ -2203,7 +2204,7 @@ const AR = {
   'Welcome back. Sign in to play your friends.': 'نوّرت تاني يا معلم! ادخل والعب مع صحابك.',
   'Pick a username your friends will find you by, and a password.': 'اختار اسم صحابك يلاقوك بيه، وباسورد محدش يعرفه.',
   'Username': 'اسم المستخدم', 'Password': 'الباسورد', 'Repeat password': 'الباسورد تاني', 'Your username': 'اسمك',
-  'e.g. cairo_knight': 'مثلاً: cairo_knight', 'Club code': 'كود النادي', 'The code Islam gave you': 'الكود اللي إسلام اداهولك',
+  'e.g. cairo_knight': 'مثلاً: cairo_knight', 'Club code': 'كود النادي', 'The code Omar gave you': 'الكود اللي عمر اداهولك',
   '3 to 20 letters, numbers or underscores. Each name can belong to one account only.': 'من ٣ لـ ٢٠ حرف أو رقم أو _ . كل اسم لحساب واحد بس.',
   "At least 6 characters. Don't reuse a password from your email or bank.": '٦ حروف على الأقل. وبلاش باسورد الإيميل أو البنك بالله عليك.',
   'At least 6 characters.': '٦ حروف على الأقل.',
@@ -2213,8 +2214,8 @@ const AR = {
   'That username is taken. Try another.': 'الاسم ده محجوز، شوفلك اسم تاني.', 'Someone is taking that name right now. Try another.': 'في حد بياخد الاسم ده دلوقتي، جرّب غيره.',
   'Use a password of at least 6 characters.': 'الباسورد لازم ٦ حروف على الأقل.', 'Use at least 6 characters.': '٦ حروف على الأقل.',
   "The two passwords don't match.": 'الباسوردين مش زي بعض.', 'Usernames are 3 to 20 letters, numbers or underscores.': 'الاسم من ٣ لـ ٢٠ حرف أو رقم أو _ .',
-  'Enter the club code you got from Islam.': 'اكتب كود النادي اللي إسلام اداهولك.',
-  "That club code isn't right. Ask Islam for the code.": 'الكود ده مش مظبوط، اسأل إسلام.',
+  'Enter the club code you got from Omar.': 'اكتب كود النادي اللي عمر اداهولك.',
+  "That club code isn't right. Ask Omar for the code.": 'الكود ده مش مظبوط، اسأل عمر.',
   "Firebase refused the account. Either the club code is wrong, or the database rules haven't been published yet.": 'الحساب اترفض. يا إما الكود غلط، يا إما قواعد قاعدة البيانات لسه ماتنشرتش.',
   "Couldn't create the account. Check your internet and try again.": 'معرفناش نعمل الحساب. شوف النت وجرّب تاني.',
   "Couldn't reach Club 64. Check your internet and try again.": 'مش عارفين نوصل لـ Club 64. شوف النت وجرّب تاني.',
@@ -2357,7 +2358,7 @@ const AR11 = {
 Object.assign(AR11, {
   'I forgot my password': 'نسيت الباسورد', 'Send reset link': 'ابعتلي لينك', 'Your username': 'اسمك في Club 64',
   "Type your username. We'll email a link to your recovery email so you can choose a new password.": 'اكتب اسمك، وهنبعتلك لينك على إيميلك تختار منه باسورد جديد.',
-  'No player with that username.': 'مفيش لعيب بالاسم ده.', "This account has no recovery email, so we can't send a link. Ask Islam (the club owner) to reset your account.": 'الحساب ده مفيهوش إيميل، فمش هنعرف نبعت لينك. كلّم إسلام (صاحب النادي) يظبطهولك.',
+  'No player with that username.': 'مفيش لعيب بالاسم ده.', "This account has no recovery email, so we can't send a link. Ask Omar (the club owner) to reset your account.": 'الحساب ده مفيهوش إيميل، فمش هنعرف نبعت لينك. كلّم عمر (صاحب النادي) يظبطهولك.',
   'Recovery email': 'إيميل الطوارئ', 'Add your email so "I forgot my password" can send you a reset link.': 'ضيف إيميلك عشان لو نسيت الباسورد نبعتلك لينك.',
   'Current password': 'الباسورد الحالي', 'Save recovery email': 'احفظ الإيميل', 'Use your real email.': 'اكتب إيميلك الحقيقي.', "That email doesn't look right.": 'الإيميل ده شكله غلط.',
   'Another account already uses that email.': 'فيه حساب تاني واخد الإيميل ده.', 'Current password is wrong.': 'الباسورد الحالي غلط.', 'Password is wrong.': 'الباسورد غلط.',
@@ -2368,13 +2369,24 @@ Object.assign(AR11, {
   'Too many tries. Wait a few minutes and try again.': 'جرّبت كتير. استنى كام دقيقة وجرّب تاني.', 'Too many tries. Wait a few minutes.': 'جرّبت كتير. استنى كام دقيقة.',
   "In this offline copy, whoever owns this device can reset your password from the account menu (tap the name at the top after logging in).": 'في النسخة الأوفلاين، صاحب الجهاز يقدر يغيّرلك الباسورد من قايمة الحساب.',
 });
+Object.assign(AR11, {
+  'Delete chat': 'امسح الشات', 'Delete this chat?': 'تمسح الشات ده؟', 'Chat deleted.': 'الشات اتمسح.', 'Block': 'بلوك', '🚫 Block': '🚫 بلوك', 'Unblock': 'شيل البلوك', 'Blocked': 'متبلّكين',
+  "Can't message or challenge you": 'مش هيقدر يكلمك أو يتحداك', "You can't message this player.": 'مش هتقدر تكلّم اللعيب ده.', "You can't challenge this player.": 'مش هتقدر تتحدى اللعيب ده.', "You can't add this player.": 'مش هتقدر تضيف اللعيب ده.',
+});
 for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
 const AR_CAT = { Bullet: 'بوليت', Blitz: 'بليتز', Rapid: 'رابيد', Classical: 'كلاسيك' };
 const AR_TAIL = s => s.replace(' · one device', ' · على جهاز واحد').replace(' · vs bot', ' · ضد بوت').replace(' · rated', ' · بتقييم');
 const AR_RX = [
+  [/^You blocked (.+?)\. They can't message or challenge you\.$/, (m, a) => `عملت بلوك لـ ${a}. مش هيقدر يكلمك أو يتحداك.`],
+  [/^You unblocked (.+?)\.$/, (m, a) => `شيلت البلوك عن ${a}.`],
+  [/^You blocked (.+?)\. Unblock them to send messages\.$/, (m, a) => `إنت عامل بلوك لـ ${a}. شيل البلوك عشان تبعتله.`],
+  [/^You blocked (.+?)\.$/, (m, a) => `إنت عامل بلوك لـ ${a}.`],
+  [/^Block (.+?)\?$/, (m, a) => `تعمل بلوك لـ ${a}؟`],
+  [/^This clears your messages with (.+?) from your Chat 64\. .+ keeps their copy\.$/, (m, a) => `ده هيمسح رسايلك مع ${a} من عندك بس. ${a} هتفضل عنده نسخته.`],
+  [/^(.+?) won't be able to message you, challenge you or send you friend requests.*$/, (m, a) => `${a} مش هيقدر يكلمك أو يتحداك أو يبعتلك طلب صداقة، وإنت مش هتشوف رسايله. وهيتشال من صحابك. تقدر تشيل البلوك في أي وقت من صفحة الصحاب.`],
   [/^Sent! Check (\S+) \(look in Spam too\)\..*$/, (m, a) => `اتبعت! افتح ${a} (بص في الـ Spam كمان)، افتح اللينك واختار باسورد جديد، وبعدين ادخل هنا باسمك والباسورد الجديد.`],
   [/^Almost done! We sent a link to (\S+)\..*$/, (m, a) => `قربنا! بعتنا لينك على ${a}. افتحه (بص في الـ Spam كمان)، وبعدين اطلع وادخل تاني.`],
-  [/^✓ (\S+) is confirmed\..*$/, (m, a) => `✓ ${a} متأكد. لو نسيت الباسورد اللينك هيروح عليه.`],
+  [/^✓ Your recovery email \((\S+)\) is confirmed\..*$/, (m, a) => `✓ إيميلك (${a}) متأكد. لو نسيت الباسورد هنبعتلك اللينك عليه.`],
   [/^Waiting: open the link we emailed to (\S+) .*$/, (m, a) => `مستنيينك: افتح اللينك اللي بعتناه على ${a} (بص في الـ Spam كمان)، وبعدين اطلع وادخل تاني.`],
   [/^Last seen (.+)$/, (m, a) => 'آخر ظهور ' + a.replace('just now', 'من شوية').replace(/^(\d+) min ago$/, 'من $1 دقيقة').replace(/^(\d+) h ago$/, 'من $1 ساعة').replace(/^(\d+) d ago$/, 'من $1 يوم')],
   [/^(\d+) online$/, (m, a) => `${a} أونلاين`],
@@ -2763,7 +2775,7 @@ function startSubs() {
       S.chats = s.docs.map(d => ({ ...d.data(), id: d.id }));
       for (const c of S.chats) {
         const seen = S.chatSeen[c.id];
-        if (c.id.startsWith('dm-') && c.lastAt && c.lastFrom !== S.uid && c.lastAt > S.loadedAt && (seen == null || c.lastAt > seen) && !(S.route.view === 'chat' && S.chatId === c.id)) toast('💬 ' + pname(c.lastFrom) + ': ' + (c.lastText || ''));
+        if (c.id.startsWith('dm-') && c.lastAt && c.lastFrom !== S.uid && !isBlocked(c.lastFrom) && c.lastAt > S.loadedAt && (seen == null || c.lastAt > seen) && !(S.route.view === 'chat' && S.chatId === c.id)) toast('💬 ' + pname(c.lastFrom) + ': ' + (c.lastText || ''));
         S.chatSeen[c.id] = c.lastAt || 0;
       }
       render();
@@ -3313,8 +3325,8 @@ function render() { if (rq) return; rq = true; requestAnimationFrame(() => { ren
 function toast(msg) { S.toast = { msg, at: now() }; renderToast(); setTimeout(() => { if (S.toast && now() - S.toast.at >= 3900) { S.toast = null; renderToast(); } }, 4000); }
 function renderToast() { $('#toast').innerHTML = S.toast ? `<div class="toast" role="status">${esc(S.toast.msg)}</div>` : ''; }
 function badgeCount() {
-  const fr = S.friends.filter(f => f.status === 'pending' && f.to === S.uid).length;
-  const inv = S.invIn.filter(i => i.status === 'pending').length;
+  const fr = S.friends.filter(f => f.status === 'pending' && f.to === S.uid && !isBlocked(f.from)).length;
+  const inv = S.invIn.filter(i => i.status === 'pending' && !isBlocked(i.from)).length;
   return { fr, inv };
 }
 function renderBar() {
@@ -3400,7 +3412,7 @@ async function doLogin(name, pw) {
     try { let alt = null; if (lower.includes('@')) alt = lower; else { try { const u = await S.db.doc('usernames/' + lower).get(); if (u.exists && u.data().e) alt = u.data().e; } catch (e) {} }
       const tries = lower.includes('@') ? [lower] : alt ? [alt, FB_EMAIL(lower)] : [FB_EMAIL(lower)]; let c = null, last = null;
       for (const em of tries) { try { c = await S.auth.signInWithEmailAndPassword(em, pw); break; } catch (e) { last = e; const k = String(e && e.code || ''); if (k.includes('too-many') || k.includes('network')) break; } }
-      if (!c) throw last; const p = await S.db.doc('profiles/' + c.user.uid).get(); if (!p.exists) { await S.auth.signOut(); return 'This account was never finished. Sign up again with the club code.'; } signIn(c.user.uid); toast('Welcome back, ' + p.data().username + '.'); return null; }
+      if (!c) throw last; let p = null; for (let i = 0; i < 6; i++) { try { p = await S.db.doc('profiles/' + c.user.uid).get(); if (p.exists || i >= 2) break; } catch (e) { if (i === 5) { const k = String(e && e.code || ''); return k.includes('network') || k.includes('unavailable') ? "Can't connect. Check your internet." : "Signed in, but Club 64 couldn't load your profile. Try again."; } } await new Promise(r => setTimeout(r, 400 + i * 300)); } if (!p.exists) { await S.auth.signOut(); return 'This account was never finished. Sign up again with the club code.'; } signIn(c.user.uid); toast('Welcome back, ' + p.data().username + '.'); return null; }
     catch (e) { const c = e && e.code || ''; if (c.includes('too-many-requests')) return 'Too many tries. Wait a minute and try again.'; if (c.includes('network')) return "Can't connect. Check your internet."; return 'Wrong username or password.'; }
   }
   if (now() < authLockUntil) return `Too many tries. Wait ${Math.ceil((authLockUntil - now()) / 1000)} seconds.`;
@@ -3425,7 +3437,7 @@ async function doSignup(raw, pw, pw2, code) {
   if (pw !== pw2) return "The two passwords don't match.";
   if (S.fb) {
     code = String(code || '').trim().toLowerCase().replace(/[\u2010-\u2015\u2212]/g, '-').replace(/\s+/g, '');
-    if (!code) return 'Enter the club code you got from Islam.';
+    if (!code) return 'Enter the club code you got from Omar.';
     const ex = await S.db.doc('usernames/' + lower).get().catch(() => null); if (ex && ex.exists) return 'That username is taken. Try another.';
     let cred;
     try { cred = await S.auth.createUserWithEmailAndPassword(FB_EMAIL(lower), pw); }
@@ -3458,7 +3470,7 @@ async function mountAccountExtras() {
     const st = $('#re-status'); const lower = (S.me.lower || S.me.username || '').toLowerCase();
     (async () => { try { const u = S.auth.currentUser; try { await u.reload(); } catch (e) {} const d = await S.db.doc('usernames/' + lower).get(); const e = d.exists && d.data().e;
       if (!e || !st.isConnected) return; $('#re-email').value = e;
-      if ((u.email || '').toLowerCase() === e.toLowerCase()) { st.style.color = 'var(--good)'; st.textContent = '✓ ' + e + ' is confirmed. "I forgot my password" will send the link there.'; }
+      if ((u.email || '').toLowerCase() === e.toLowerCase()) { st.style.color = 'var(--good)'; st.textContent = '✓ Your recovery email (' + e + ') is confirmed. If you forget your password, we\'ll send the reset link there.'; }
       else { st.style.color = 'var(--warn, #b45309)'; st.textContent = 'Waiting: open the link we emailed to ' + e + ' (look in Spam too). After that, log out and log in again.'; } } catch (e) {} })();
     re.addEventListener('submit', async ev => {
       ev.preventDefault(); const out = $('#re-err'); out.style.color = 'var(--bad)'; out.textContent = ''; const btn = re.querySelector('button[type=submit]');
@@ -3514,7 +3526,7 @@ VIEWS.auth = {
         <div class="field"><label class="label" for="au-name">Username</label><input id="au-name" type="text" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="${login ? 'Your username' : 'e.g. cairo_knight'}" required></div>
         ${login ? '' : '<p class="small muted" style="margin-top:-8px">3 to 20 letters, numbers or underscores. Each name can belong to one account only.</p>'}
         <div class="field"><label class="label" for="au-pw">Password</label><input id="au-pw" type="password" autocomplete="${login ? 'current-password' : 'new-password'}" required></div>
-        ${login ? '' : `<div class="field"><label class="label" for="au-pw2">Repeat password</label><input id="au-pw2" type="password" autocomplete="new-password" required></div><p class="small muted" style="margin-top:-8px">At least 6 characters.${S.fb ? '' : " Don't reuse a password from your email or bank."}</p>${S.fb ? `<div class="field"><label class="label" for="au-code">Club code</label><input id="au-code" type="text" autocapitalize="none" spellcheck="false" placeholder="The code Islam gave you" required></div>` : ''}`}
+        ${login ? '' : `<div class="field"><label class="label" for="au-pw2">Repeat password</label><input id="au-pw2" type="password" autocomplete="new-password" required></div><p class="small muted" style="margin-top:-8px">At least 6 characters.${S.fb ? '' : " Don't reuse a password from your email or bank."}</p>${S.fb ? `<div class="field"><label class="label" for="au-code">Club code</label><input id="au-code" type="text" autocapitalize="none" spellcheck="false" placeholder="The code Omar gave you" required></div>` : ''}`}
         <p class="small" id="au-err" style="color:var(--bad)" role="alert"></p>
         <button class="btn primary lg" type="submit">${login ? 'Log in' : 'Create account'}</button>
         ${login ? `<p class="small" style="text-align:center;margin:0"><a href="#" data-act="forgot">I forgot my password</a></p>` : ''}
@@ -3531,7 +3543,7 @@ VIEWS.auth = {
         else if (mode === 'signup') msg = await doSignup($('#au-name').value.trim(), $('#au-pw').value, $('#au-pw2').value, ($('#au-code') ? $('#au-code').value : ''));
         else { const a = $('#au-pw').value, b = $('#au-pw2').value; if (a.length < 6) msg = 'Use at least 6 characters.'; else if (a !== b) msg = "The two passwords don't match."; else { await setPassword(S.setpwUid, a); S.authMode = 'login'; signIn(S.setpwUid); } }
         if (msg) err.textContent = msg;
-      } catch (e2) { console.warn(e2); err.textContent = e2 && e2.message === 'nocrypto' ? 'This browser cannot protect passwords. Try Chrome, Safari or Edge.' : S.fb ? "Couldn't reach Club 64. Check your internet and try again." : "Couldn't reach Club 64. If you're on the online link, ask Islam to add you as an Editor."; }
+      } catch (e2) { console.warn(e2); err.textContent = e2 && e2.message === 'nocrypto' ? 'This browser cannot protect passwords. Try Chrome, Safari or Edge.' : S.fb ? "Couldn't reach Club 64. Check your internet and try again." : "Couldn't reach Club 64. If you're on the online link, ask Omar to add you as an Editor."; }
       btn.disabled = false;
     });
     const n = $('#au-name') || $('#au-pw'); if (n) n.focus();
@@ -3542,7 +3554,7 @@ VIEWS.auth = {
 
 /* play */
 function inboxHTML() {
-  const inv = S.invIn.filter(i => i.status === 'pending').sort((a, b) => b.createdAt - a.createdAt);
+  const inv = S.invIn.filter(i => i.status === 'pending' && !isBlocked(i.from)).sort((a, b) => b.createdAt - a.createdAt);
   if (!inv.length) return `<div class="empty">No invitations yet. Challenges and tournament invites from friends show up here.</div>`;
   return `<div class="list">${inv.map(i => {
     if (i.kind === 'challenge') return `<div class="li"><div class="grow"><div class="t">${esc(pname(i.from))} challenges you</div><div class="small muted">${fmtTC(i.base, i.inc)} · rated</div></div><button class="btn sm primary" data-act="ch-accept" data-id="${i.id}">Accept</button><button class="btn sm" data-act="inv-dismiss" data-id="${i.id}" data-st="declined">Decline</button></div>`;
@@ -4153,13 +4165,13 @@ VIEWS.player = {
     if (!S.pgames || !S.pgames[uid]) setTimeout(() => loadPlayerGames(uid), 0);
     const pg = S.pgames && S.pgames[uid]; const games = (pg && pg.list) || [];
     const f = S.friends.find(x => x.members.includes(uid) && x.members.includes(S.uid)); const me = uid === S.uid;
-    const fbtn = me ? '' : !f ? `<button class="btn primary" data-act="fr-add" data-u="${esc(uid)}">Add friend</button>` : f.status === 'accepted' ? `<button class="btn primary" data-act="challenge" data-u="${esc(uid)}">Challenge</button>` : f.from === S.uid ? `<span class="pill">Friend request sent</span>` : `<button class="btn primary" data-act="fr-accept" data-id="${f.id}">Accept friend request</button>`;
+    const fbtn = me ? '' : isBlocked(uid) ? `<span class="pill">Blocked</span>` : !f ? `<button class="btn primary" data-act="fr-add" data-u="${esc(uid)}">Add friend</button>` : f.status === 'accepted' ? `<button class="btn primary" data-act="challenge" data-u="${esc(uid)}">Challenge</button>` : f.from === S.uid ? `<span class="pill">Friend request sent</span>` : `<button class="btn primary" data-act="fr-accept" data-id="${f.id}">Accept friend request</button>`;
     const fin = games.filter(g => g.status === 'finished'); const won = fin.filter(g => (g.result === '1-0' && g.white === uid) || (g.result === '0-1' && g.black === uid)).length; const drawn = fin.filter(g => g.result === '1/2-1/2').length;
     const live = games.find(g => g.status === 'active');
     return `<div class="stack"><button class="btn sm" data-act="back" style="align-self:flex-start">← Back</button>
       <section class="card"><div class="phead"><span class="pav">${esc((p.username || '?')[0].toUpperCase())}${odot(uid)}</span><div class="grow"><h1>${esc(p.username)}${me ? ' <span class="small muted">(you)</span>' : ''}</h1><div class="small muted">${statusText(uid)}</div></div></div>
         <div class="pstats">${['bullet', 'blitz', 'rapid'].map(c => `<div><span class="label">${CAT_NAME[c]}</span><b class="mono">${rating(uid, c)}</b></div>`).join('')}<div><span class="label">Games</span><b class="mono">${fin.length}</b></div><div><span class="label">Won</span><b class="mono">${won}</b></div><div><span class="label">Drawn</span><b class="mono">${drawn}</b></div></div>
-        <div class="row" style="margin-top:12px">${fbtn}${!me ? `<button class="btn" data-act="chat-with" data-u="${esc(uid)}">💬 Chat</button>` : ''}${live ? `<button class="btn" data-act="open-game" data-id="${live.id}">Watch live game</button>` : ''}</div></section>
+        <div class="row" style="margin-top:12px">${fbtn}${!me && !isBlocked(uid) ? `<button class="btn" data-act="chat-with" data-u="${esc(uid)}">💬 Chat</button>` : ''}${!me ? `<button class="btn" data-act="block" data-u="${esc(uid)}" data-on="${isBlocked(uid) ? 0 : 1}">${isBlocked(uid) ? 'Unblock' : '🚫 Block'}</button>` : ''}${live ? `<button class="btn" data-act="open-game" data-id="${live.id}">Watch live game</button>` : ''}</div></section>
       <section class="card stack"><div class="spread"><h2>Games</h2><button class="btn sm" data-act="pg-refresh" data-u="${esc(uid)}">Refresh</button></div>
         ${!pg || (pg.loading && !pg.list) ? '<div class="empty">Loading games…</div>' : games.length ? `<div class="hlist">${games.map(g => playerGamesRow(g, uid)).join('')}</div>` : '<div class="empty">No games yet.</div>'}</section></div>`;
   },
@@ -4169,9 +4181,27 @@ VIEWS.player = {
 const EMOJIS = ['😀', '😂', '🤣', '😅', '😎', '😍', '🥳', '😮', '🤔', '😬', '😭', '😡', '👍', '👎', '👏', '🙏', '🤝', '💪', '🔥', '⚡', '🎉', '❤️', '💯', '👀', '😴', '🤯', '🫡', '♟️', '👑', '🏆', '⏰', '🍀'];
 const QUICK = ['Hi 👋', 'Good luck 🍀', 'Good move 👍', 'Sorry 🙏', 'Oops 😅', 'Thanks 🙏', 'Wow 😮', 'Well played 🤝', 'Good game 🤝', 'Rematch? 🔁'];
 const chatIdFor = u => 'dm-' + pairId(S.uid, u);
+const myBlocked = () => (S.me && S.me.blocked) || [];
+const isBlocked = u => !!u && myBlocked().includes(u);
+const blocksMe = u => !!u && ((S.profiles[u] && S.profiles[u].blocked) || []).includes(S.uid);
+const clearedAt = c => ((c && c.cleared) || {})[S.uid] || 0;
+const visibleMsgs = c => ((c && c.msgs) || []).filter(m => m.at > clearedAt(c) && !isBlocked(m.from));
+async function setBlock(u, on) {
+  if (!u || u === S.uid) return;
+  const list = new Set(myBlocked()); if (on) list.add(u); else list.delete(u);
+  try {
+    await S.db.doc('profiles/' + S.uid).update({ blocked: [...list] });
+    if (S.me) S.me = { ...S.me, blocked: [...list] };
+    if (on) {
+      const f = S.friends.find(x => x.members.includes(u) && x.members.includes(S.uid)); if (f) S.db.doc('friends/' + f.id).delete().catch(() => {});
+      for (const i of S.invIn.filter(i => i.from === u && i.status === 'pending')) S.db.doc('invites/' + i.id).update({ status: 'declined' }).catch(() => {});
+    }
+    toast(on ? `You blocked ${pname(u)}. They can't message or challenge you.` : `You unblocked ${pname(u)}.`); render();
+  } catch (e) { console.warn(e); toast(S.fb ? "Couldn't save that. Check your internet and try again." : "Couldn't save that."); }
+}
 function chatTitle(c) { if (!c) return ''; if (c.id === 'club') return 'Club 64 room'; const u = (c.members || []).find(m => m !== S.uid); return pname(u); }
 function chatOther(c) { return c && c.id !== 'club' ? (c.members || []).find(m => m !== S.uid) : null; }
-function unreadOf(c) { if (!c || !c.lastAt || c.lastFrom === S.uid) return false; return c.lastAt > ((c.read || {})[S.uid] || 0); }
+function unreadOf(c) { if (!c || !c.lastAt || c.lastFrom === S.uid || isBlocked(c.lastFrom) || c.lastAt <= clearedAt(c)) return false; return c.lastAt > ((c.read || {})[S.uid] || 0); }
 function chatUnreadCount() { if (S.mode !== 'online') return 0; let n = S.chats.filter(c => c.id.startsWith('dm-') && unreadOf(c)).length; if (S.club && unreadOf(S.club)) n++; return n; }
 async function dbPush(path, field, value, extra) {
   const r = S.db.doc(path);
@@ -4185,6 +4215,7 @@ async function ensureChat(id, members) {
   if (!ex) await r.set(id === 'club' ? { kind: 'club', msgs: [], lastAt: 0, read: {} } : { kind: id.startsWith('g-') ? 'game' : 'dm', members, msgs: [], lastAt: 0, read: {} });
 }
 async function sendChat(id, members, msg) {
+  if (id !== 'club' && members) { const o = members.find(x => x !== S.uid); if (isBlocked(o)) { toast(`You blocked ${pname(o)}. Unblock them to send messages.`); return; } if (blocksMe(o)) { toast("You can't message this player."); return; } }
   const m = { id: rid(10), from: S.uid, at: now(), ...msg };
   const preview = m.img ? '📷 Photo' : String(m.t || '').slice(0, 80);
   const local = id === S.chatId ? 'chatDoc' : (S.gchat && S.gchat.id === id ? 'gchat' : null);
@@ -4205,6 +4236,7 @@ async function imgToDataURL(file, max = 1024, q = .72) {
   } finally { URL.revokeObjectURL(url); }
 }
 async function sendPhoto(id, members, file) {
+  if (id !== 'club' && members) { const o = members.find(x => x !== S.uid); if (isBlocked(o) || blocksMe(o)) { toast("You can't message this player."); return; } }
   try {
     const data = await imgToDataURL(file);
     const imgId = 'i' + rid(12);
@@ -4243,11 +4275,11 @@ function markRead(id, d) {
   if ((d.msgs || []).length > 220) S.db.doc('chats/' + id).update({ msgs: d.msgs.slice(-180) }).catch(() => {});
 }
 function chatListHTML() {
-  const dms = S.chats.filter(c => c.id.startsWith('dm-') && (c.lastAt || c.id === S.chatId)).sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0));
+  const dms = S.chats.filter(c => c.id.startsWith('dm-') && !isBlocked(chatOther(c)) && ((c.lastAt && c.lastAt > clearedAt(c)) || c.id === S.chatId)).sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0));
   const row = (c, title, sub, extra) => `<button class="crow ${S.chatId === c.id ? 'on' : ''}" data-act="chat-open" data-id="${esc(c.id)}">${extra}<span class="grow"><span class="t">${esc(title)}</span><span class="small muted cprev">${esc(sub || '')}</span></span>${unreadOf(c) ? '<span class="dot static">•</span>' : ''}</button>`;
   const club = S.club || { id: 'club' };
-  return `<div class="clist">${row(club, 'Club 64 room', club.lastText ? `${club.lastFrom === S.uid ? 'You' : pname(club.lastFrom)}: ${club.lastText}` : 'Everyone in the club', '<span class="cav club">64</span>')}
-    ${dms.map(c => { const u = chatOther(c); return row(c, pname(u), c.lastText ? (c.lastFrom === S.uid ? 'You: ' : '') + c.lastText : 'Say hi 👋', `<span class="cav">${esc(pname(u)[0].toUpperCase())}${odot(u)}</span>`); }).join('')}
+  return `<div class="clist">${row(club, 'Club 64 room', club.lastText && !isBlocked(club.lastFrom) ? `${club.lastFrom === S.uid ? 'You' : pname(club.lastFrom)}: ${club.lastText}` : 'Everyone in the club', '<span class="cav club">64</span>')}
+    ${dms.map(c => { const u = chatOther(c); return row(c, pname(u), c.lastText && c.lastAt > clearedAt(c) ? (c.lastFrom === S.uid ? 'You: ' : '') + c.lastText : 'Say hi 👋', `<span class="cav">${esc(pname(u)[0].toUpperCase())}${odot(u)}</span>`); }).join('')}
     ${!dms.length ? '<div class="empty small" style="margin-top:8px">No private chats yet. Tap New chat to message a friend.</div>' : ''}</div>`;
 }
 function composerHTML(prefix) {
@@ -4266,9 +4298,9 @@ VIEWS.chat = {
       conv = `<div class="conv"><div class="chead"><button class="btn sm" data-act="chat-pick-close">←</button><b>New chat</b></div><div class="cbody stack"><input id="chat-q" type="text" placeholder="Search a username" value="${esc(S.chatQ || '')}" autocomplete="off"><div class="list">${ps.map(p => `<button class="crow" data-act="chat-with" data-u="${esc(p.id)}"><span class="cav">${esc(p.username[0].toUpperCase())}${odot(p.id)}</span><span class="grow"><span class="t">${esc(p.username)}</span><span class="small muted">${statusText(p.id)}</span></span></button>`).join('') || '<div class="empty">No players found.</div>'}</div></div></div>`;
     } else if (id) {
       const other = id === 'club' ? null : (d && chatOther(d)) || (S.chatWith || null);
-      const msgs = (d && d.msgs) || [];
-      conv = `<div class="conv"><div class="chead"><button class="btn sm cback" data-act="chat-close" aria-label="Back to chats">←</button>${other ? `<span class="pl" data-act="player" data-u="${esc(other)}"><span class="cav">${esc(pname(other)[0].toUpperCase())}${odot(other)}</span><span><b>${esc(pname(other))}</b><span class="small muted" style="display:block">${statusText(other)}</span></span></span>` : '<span class="cav club">64</span><span><b>Club 64 room</b><span class="small muted" style="display:block">Everyone in the club can read this</span></span>'}</div>
-        <div class="cbody" id="cbody">${!d ? '<div class="empty">Loading…</div>' : msgs.length ? msgs.map(m => bubbleHTML(m, id === 'club')).join('') : '<div class="empty">No messages yet. Say hi 👋</div>'}</div>${composerHTML('chat')}</div>`;
+      const msgs = visibleMsgs(d);
+      conv = `<div class="conv"><div class="chead"><button class="btn sm cback" data-act="chat-close" aria-label="Back to chats">←</button>${other ? `<span class="pl" data-act="player" data-u="${esc(other)}"><span class="cav">${esc(pname(other)[0].toUpperCase())}${odot(other)}</span><span><b>${esc(pname(other))}</b><span class="small muted" style="display:block">${statusText(other)}</span></span></span><span class="grow"></span><button class="btn sm" data-act="chat-del" aria-label="Delete chat" title="Delete chat">🗑<span class="hide-sm"> Delete chat</span></button><button class="btn sm" data-act="block" data-u="${esc(other)}" data-on="${isBlocked(other) ? 0 : 1}">${isBlocked(other) ? 'Unblock' : '🚫<span class="hide-sm"> Block</span>'}</button>` : '<span class="cav club">64</span><span><b>Club 64 room</b><span class="small muted" style="display:block">Everyone in the club can read this</span></span>'}</div>
+        <div class="cbody" id="cbody">${!d ? '<div class="empty">Loading…</div>' : msgs.length ? msgs.map(m => bubbleHTML(m, id === 'club')).join('') : '<div class="empty">No messages yet. Say hi 👋</div>'}</div>${other && isBlocked(other) ? `<div class="banner info" style="margin:10px">You blocked ${esc(pname(other))}. <button class="btn sm" data-act="block" data-u="${esc(other)}" data-on="0">Unblock</button></div>` : other && blocksMe(other) ? `<div class="banner info" style="margin:10px">You can't message this player.</div>` : composerHTML('chat')}</div>`;
     } else conv = `<div class="conv empty-conv"><div class="empty">Pick a chat, or start a new one.</div></div>`;
     return `<div class="chatwrap ${id || S.chatPick ? 'has-conv' : ''}"><aside class="chatside"><div class="spread"><h2>Chat 64</h2><button class="btn sm primary" data-act="chat-new">New chat</button></div>${chatListHTML()}</aside>${conv}</div>`;
   },
@@ -4287,13 +4319,13 @@ function subGameChat(g) {
     if (S.gchat && (S.gchat.msgs || []).length > (d.msgs || []).length) return;
     const prevN = S.gchat ? (S.gchat.msgs || []).length : null; S.gchat = d;
     const last = (d.msgs || [])[d.msgs.length - 1];
-    if (prevN != null && d.msgs.length > prevN && last && last.from !== S.uid) { toast('💬 ' + pname(last.from) + ': ' + (last.t || '📷')); }
+    if (prevN != null && d.msgs.length > prevN && last && last.from !== S.uid && !isBlocked(last.from)) { toast('💬 ' + pname(last.from) + ': ' + (last.t || '📷')); }
     render();
   }, () => {});
 }
 function gameChatHTML(g) {
   if (!S.gchatId || S.gchatId !== 'g-' + g.id) return '';
-  const msgs = ((S.gchat && S.gchat.msgs) || []).slice(-30);
+  const msgs = visibleMsgs(S.gchat).slice(-30);
   return `<section class="gchat"><div class="label">Chat 64</div><div class="gcmsgs" id="gcmsgs">${msgs.length ? msgs.map(m => bubbleHTML(m, false)).join('') : '<div class="small muted">Say something nice 🙂</div>'}</div>
     <div class="qchips">${QUICK.map(q => `<button class="chip qc" data-act="quick" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>${composerHTML('game')}</section>`;
 }
@@ -4333,9 +4365,10 @@ VIEWS.friends = {
       return `<div class="li"><span class="av" style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800">${esc(p.username[0].toUpperCase())}</span><div class="grow"><div class="t"><span class="pl" data-act="player" data-u="${esc(p.id)}">${odot(p.id)}${esc(p.username)}</span></div><div class="small muted mono">${CAT_NAME[cat]} ${rating(p.id, cat)}</div></div>${btn}</div>`; }).join('')}</div>` : `<div class="empty">No player called “${esc(S.frq.trim())}”.</div>`;
     const acc = S.friends.filter(f => f.status === 'accepted');
     $('#fr-list').innerHTML = `<h2>Your friends</h2>${acc.length ? `<div class="list">${acc.map(f => { const u = f.members.find(m => m !== S.uid); const pl = S.profiles[u] && S.profiles[u].playing; return `<div class="li"><div class="grow"><div class="t"><span class="pl" data-act="player" data-u="${esc(u)}">${odot(u)}${esc(pname(u))}</span></div><div class="small muted"><span class="mono">${CAT_NAME[cat]} ${rating(u, cat)}</span> · <span>${statusText(u)}</span></div></div>${pl && presenceOf(u) === 'playing' ? `<button class="btn sm" data-act="open-game" data-id="${esc(pl)}">Watch</button>` : ''}<button class="btn sm" data-act="chat-with" data-u="${esc(u)}" aria-label="Chat">💬</button><button class="btn sm primary" data-act="challenge" data-u="${esc(u)}">Challenge</button><button class="btn sm" data-act="fr-remove" data-id="${f.id}" aria-label="Remove friend">Remove</button></div>`; }).join('')}</div>` : `<div class="empty">Search for a username to send your first friend request.</div>`}`;
-    const inc = S.friends.filter(f => f.status === 'pending' && f.to === S.uid), out = S.friends.filter(f => f.status === 'pending' && f.from === S.uid);
+    const inc = S.friends.filter(f => f.status === 'pending' && f.to === S.uid && !isBlocked(f.from)), out = S.friends.filter(f => f.status === 'pending' && f.from === S.uid);
     $('#fr-req').innerHTML = `<h2>Requests</h2>${inc.length ? `<div class="list">${inc.map(f => `<div class="li"><div class="grow"><div class="t">${esc(pname(f.from))}</div><div class="small muted">wants to be friends</div></div><button class="btn sm primary" data-act="fr-accept" data-id="${f.id}">Accept</button><button class="btn sm" data-act="fr-remove" data-id="${f.id}">Decline</button></div>`).join('')}</div>` : '<div class="empty">No pending requests.</div>'}
-      ${out.length ? `<h3 style="margin-top:14px">Sent</h3><div class="list">${out.map(f => `<div class="li"><div class="grow"><div class="t">${esc(pname(f.to))}</div><div class="small muted">Waiting for them to accept</div></div><button class="btn sm" data-act="fr-remove" data-id="${f.id}">Cancel</button></div>`).join('')}</div>` : ''}`;
+      ${out.length ? `<h3 style="margin-top:14px">Sent</h3><div class="list">${out.map(f => `<div class="li"><div class="grow"><div class="t">${esc(pname(f.to))}</div><div class="small muted">Waiting for them to accept</div></div><button class="btn sm" data-act="fr-remove" data-id="${f.id}">Cancel</button></div>`).join('')}</div>` : ''}
+      ${myBlocked().length ? `<h3 style="margin-top:14px">Blocked</h3><div class="list">${myBlocked().map(u => `<div class="li"><div class="grow"><div class="t">${esc(pname(u))}</div><div class="small muted">Can't message or challenge you</div></div><button class="btn sm" data-act="block" data-u="${esc(u)}" data-on="0">Unblock</button></div>`).join('')}</div>` : ''}`;
   },
 };
 
@@ -4385,7 +4418,7 @@ function renderModal() {
         <input id="dl-user" type="text" placeholder="Type your username to confirm" autocapitalize="none" spellcheck="false" required>
         <input id="dl-pw" type="password" placeholder="Your password" autocomplete="current-password" required>
         <p class="small" id="dl-err" role="alert" style="margin:0;color:var(--bad)"></p><button class="btn danger" type="submit">Delete my account forever</button></form></details>` : ''}
-      <p class="small muted" style="margin:0">Club 64 · version 12</p></div></div>`;
+      <p class="small muted" style="margin:0">Club 64 · version 13</p></div></div>`;
     mountAccountExtras();
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
@@ -4415,7 +4448,7 @@ function renderModal() {
       try {
         const u = await S.db.doc('usernames/' + lower).get();
         if (!u.exists) out.textContent = 'No player with that username.';
-        else if (!u.data().e) out.textContent = "This account has no recovery email, so we can't send a link. Ask Islam (the club owner) to reset your account.";
+        else if (!u.data().e) out.textContent = "This account has no recovery email, so we can't send a link. Ask Omar (the club owner) to reset your account.";
         else { await S.auth.sendPasswordResetEmail(u.data().e); out.style.color = 'var(--good)'; out.textContent = 'Sent! Check ' + maskEmail(u.data().e) + ' (look in Spam too). Open the link, choose a new password, then log in here with your username and the new password.'; }
       } catch (e2) { const k = String(e2 && e2.code || ''); out.textContent = k.includes('too-many') ? 'Too many tries. Wait a few minutes and try again.' : k.includes('network') ? "Can't connect. Check your internet." : "Couldn't send the link. Try again in a minute."; }
       btn.disabled = false;
@@ -4434,6 +4467,7 @@ function confirmBox(title, body, yes, fn, danger) { S.modal = { type: 'confirm',
 /* ---------- actions ---------- */
 const pairId = (a, b) => [a, b].sort().join('~');
 async function sendChallenge(to, tc) {
+  if (blocksMe(to) || isBlocked(to)) { toast("You can't challenge this player."); return; }
   try { await w(S.db.collection('invites').add({ kind: 'challenge', from: S.uid, to, base: tc[0], inc: tc[1], status: 'pending', createdAt: now() })); toast(`Challenge sent to ${pname(to)}. The game opens when they accept.`); } catch (e) {}
 }
 const ACTIONS = {
@@ -4499,6 +4533,14 @@ const ACTIONS = {
   'chat-close': () => { S.chatId = null; subChat(null); mountedKey = null; render(); },
   'chat-new': () => { S.chatPick = true; S.chatQ = ''; mountedKey = null; go('chat'); },
   'chat-pick-close': () => { S.chatPick = false; mountedKey = null; render(); },
+  'chat-del': () => { const id = S.chatId; if (!id || id === 'club') return; const o = S.chatWith || chatOther(S.chatDoc);
+    confirmBox('Delete this chat?', `This clears your messages with ${pname(o)} from your Chat 64. ${pname(o)} keeps their copy.`, 'Delete chat', async () => {
+      try { await S.db.doc('chats/' + id).update({ cleared: { [S.uid]: now() } }); } catch (e) { /* chat may not exist yet */ }
+      S.chats = S.chats.map(c => c.id === id ? { ...c, cleared: { ...(c.cleared || {}), [S.uid]: now() } } : c);
+      S.chatId = null; S.chatWith = null; subChat(null); mountedKey = null; render(); toast('Chat deleted.'); }, true); },
+  block: el => { const u = el.dataset.u; const on = el.dataset.on === '1';
+    if (!on) { setBlock(u, false); return; }
+    confirmBox(`Block ${pname(u)}?`, `${pname(u)} won't be able to message you, challenge you or send you friend requests, and you won't see their messages. They'll be removed from your friends. You can unblock them any time from the Friends page.`, 'Block', () => setBlock(u, true), true); },
   'chat-with': el => { const u = el.dataset.u; if (!u || u === S.uid) return; S.chatPick = false; S.chatId = chatIdFor(u); S.chatWith = u; mountedKey = null; go('chat'); },
   'emoji-toggle': el => { S.emojiOpen = S.emojiOpen === el.dataset.cp ? null : el.dataset.cp; render(); },
   emoji: el => { const cp = el.dataset.cp; S.drafts[cp] = (S.drafts[cp] || '') + el.dataset.e; const i = $('#tx-' + cp); if (i) { i.value = S.drafts[cp]; i.focus(); } },
@@ -4544,7 +4586,7 @@ const ACTIONS = {
     try { await w(S.db.collection('bots').add({ name: name.slice(0, 40), photo: m.photo || null, level: m.level, createdBy: S.uid, createdAt: now() })); S.modal = null; renderModal(); toast(name + ' is ready to play.'); } catch (e) {}
   },
   'bot-del': el => { const b = S.bots.find(x => x.id === el.dataset.id); if (!b) return; confirmBox(`Delete ${b.name}?`, 'The bot is removed for everyone.', 'Delete bot', () => w(S.db.doc('bots/' + b.id).delete()).catch(() => {}), true); },
-  'fr-add': el => { const u = el.dataset.u; w(S.db.doc('friends/' + pairId(S.uid, u)).set({ members: [S.uid, u], from: S.uid, to: u, status: 'pending', createdAt: now() })).then(() => toast('Friend request sent.')).catch(() => {}); },
+  'fr-add': el => { const u = el.dataset.u; if (blocksMe(u) || isBlocked(u)) { toast("You can't add this player."); return; } w(S.db.doc('friends/' + pairId(S.uid, u)).set({ members: [S.uid, u], from: S.uid, to: u, status: 'pending', createdAt: now() })).then(() => toast('Friend request sent.')).catch(() => {}); },
   'fr-accept': el => { w(S.db.doc('friends/' + el.dataset.id).update({ status: 'accepted', acceptedAt: now() })).catch(() => {}); },
   'fr-remove': el => { w(S.db.doc('friends/' + el.dataset.id).delete()).catch(() => {}); },
 };
