@@ -262,6 +262,57 @@ html[lang=ar] .label{letter-spacing:0}
 [dir=rtl] .pair .w{text-align:right}
 [dir=rtl] .sq .co.r{left:3px;right:auto}
 #moves{position:relative}
+/* presence */
+.odot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#2fbf71;box-shadow:0 0 0 2px var(--surface);margin-right:6px;vertical-align:1px;flex:none}
+.odot.playing{background:#f5a524}
+.pl{cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pl:hover b,.pl:hover{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+.phead{display:flex;align-items:center;gap:14px}
+.pav{position:relative;width:64px;height:64px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font:800 1.8rem var(--f-display);flex:none}
+.pav .odot{position:absolute;right:0;bottom:2px;width:16px;height:16px;margin:0;box-shadow:0 0 0 3px var(--surface)}
+.pstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-top:14px}
+.pstats>div{background:var(--surface-2);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.pstats b{font-size:1.2rem}
+/* chat */
+.chatwrap{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:16px;height:calc(100vh - 140px);min-height:420px}
+.chatside{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;overflow:auto;display:flex;flex-direction:column;gap:10px}
+.clist{display:flex;flex-direction:column;gap:2px}
+.crow{display:flex;align-items:center;gap:10px;width:100%;padding:9px 8px;border:0;border-radius:10px;background:none;cursor:pointer;text-align:start;min-width:0}
+.crow:hover,.crow.on{background:var(--surface-2)}
+.crow .grow{display:flex;flex-direction:column;min-width:0}
+.crow .t{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cprev{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot.static{position:static;background:var(--accent);color:var(--accent-ink);width:10px;height:10px;min-width:10px;padding:0;border-radius:50%;font-size:0}
+.cav{position:relative;width:38px;height:38px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800;flex:none}
+.cav.club{background:var(--ink);color:var(--accent);font-family:var(--f-display)}
+.cav .odot{position:absolute;right:-1px;bottom:-1px;margin:0}
+.conv{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.empty-conv{display:grid;place-items:center}
+.chead{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.cback{display:none}
+.cbody{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:6px;min-height:0}
+.bub{max-width:78%;align-self:flex-start;background:var(--surface-2);border-radius:14px 14px 14px 4px;padding:8px 12px;display:flex;flex-direction:column;gap:2px;word-wrap:break-word;overflow-wrap:anywhere}
+.bub.me{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-radius:14px 14px 4px 14px}
+.bub.big{background:none!important;padding:0 4px}.bub.big .ctext{font-size:2rem;line-height:1.1}
+.btime{font-size:.68rem;opacity:.7;align-self:flex-end}
+.bname{font-size:.75rem;font-weight:700;color:var(--accent)}
+.bub.me .bname{color:inherit}
+.cimg{max-width:min(240px,60vw);max-height:300px;border-radius:10px;cursor:zoom-in;display:block}
+.composer{border-top:1px solid var(--line);padding:10px;display:flex;flex-direction:column;gap:8px}
+.crow2{display:flex;gap:8px;align-items:center}
+.crow2 input[type=text]{flex:1;min-width:0}
+.crow2 .iconbtn{font-size:1.1rem;cursor:pointer}
+.emgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:4px;max-height:160px;overflow:auto}
+.emgrid button{font-size:1.35rem;background:none;border:0;border-radius:8px;padding:4px;cursor:pointer}
+.emgrid button:hover{background:var(--surface-2)}
+.imgmodal img{max-width:100%;max-height:75vh;border-radius:10px;align-self:center}
+.gchat{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface)}
+.gcmsgs{max-height:170px;overflow:auto;display:flex;flex-direction:column;gap:4px}
+.gchat .composer{border:0;padding:0}
+.qchips{display:flex;flex-wrap:wrap;gap:6px}
+.chip.qc{padding:5px 10px;cursor:pointer;font-size:.82rem}
+.chip.qc:hover{border-color:var(--accent)}
+@media (max-width:760px){.chatwrap{grid-template-columns:minmax(0,1fr);height:calc(100vh - 170px)}.chatwrap.has-conv .chatside{display:none}.chatwrap:not(.has-conv) .conv{display:none}.cback{display:inline-flex}}
 .exp{display:flex;flex-direction:column;gap:6px}
 .hlist{display:flex;flex-direction:column}
 .hrow{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
@@ -2284,9 +2335,31 @@ const AR = {
   'Brilliant': 'عبقرية', 'Great': 'جامدة', 'Best': 'الأحسن', 'Excellent': 'ممتازة', 'Good': 'حلوة', 'Book': 'من الكتاب',
   'Forced': 'مفيش غيرها', 'Inaccuracy': 'مش أحسن حاجة', 'Mistake': 'غلطة', 'Miss': 'فوّتها', 'Blunder': 'مصيبة',
 };
+const AR11 = {
+  'Chat 64': 'شات 64', 'Chat 64 works in the online version.': 'شات 64 شغال في النسخة الأونلاين بس.', 'Club 64 room': 'أوضة Club 64',
+  'Everyone in the club': 'كل اللي في النادي', 'Everyone in the club can read this': 'كل اللي في النادي هيشوفوا الكلام ده',
+  'Friends online': 'صحابك الأونلاين', 'Live now': 'شغال دلوقتي 🔴', 'Live': 'لايف', 'Watch': 'اتفرّج 👀', 'Watch live game': 'اتفرّج على الماتش لايف',
+  'Online': 'أونلاين', 'Offline': 'مش موجود', 'Playing now': 'بيلعب دلوقتي', 'New chat': 'شات جديد',
+  'No private chats yet. Tap New chat to message a friend.': 'لسه مفيش شاتات. دوس "شات جديد" وكلّم صاحبك.',
+  'Pick a chat, or start a new one.': 'اختار شات أو ابدأ واحد جديد.', 'None of your friends are online right now.': 'مفيش حد من صحابك أونلاين دلوقتي 😴',
+  'Type a message': 'اكتب رسالة…', 'Send': 'ابعت', 'Say hi 👋': 'قول أهلاً 👋', 'No messages yet. Say hi 👋': 'لسه مفيش رسايل. قول أهلاً 👋',
+  'Say something nice 🙂': 'قول حاجة حلوة 🙂', '📷 Loading photo…': '📷 الصورة بتحمّل…', 'Loading games…': 'الماتشات بتحمّل…', 'Loading…': 'بيحمّل…',
+  'Search a username': 'دوّر على اسم', 'No players found.': 'مفيش لعيبة بالاسم ده.', "This player doesn't exist.": 'اللعيب ده مش موجود.',
+  'Games': 'الماتشات', 'Won': 'كسب', 'Lost': 'خسر', 'Drawn': 'تعادل', 'Draw': 'تعادل', 'Aborted': 'اتلغى', 'Refresh': 'تحديث', 'View': 'شوف',
+  'No games yet.': 'لسه مفيش ماتشات.', '💬 Chat': '💬 شات', 'Add friend': 'ضيفه صاحب', 'Friend request sent': 'طلب الصداقة اتبعت', 'Accept friend request': 'اقبل طلب الصداقة',
+  'Back': 'رجوع', '← Back': '→ رجوع', 'You': 'إنت', 'You:': 'إنت:', 'Lichess ↗': 'Lichess ↗',
+  "👀 You're watching": '👀 إنت بتتفرّج على', 'vs': 'ضد',
+  'Hi 👋': 'أهلاً 👋', 'Good luck 🍀': 'بالتوفيق 🍀', 'Good move 👍': 'نقلة حلوة 👍', 'Sorry 🙏': 'سوري 🙏', 'Oops 😅': 'أوبس 😅',
+  'Thanks 🙏': 'شكراً 🙏', 'Wow 😮': 'واو 😮', 'Well played 🤝': 'لعبت حلو 🤝', 'Good game 🤝': 'ماتش حلو 🤝', 'Rematch? 🔁': 'نعيد؟ 🔁',
+  "Couldn't send the message. Check your internet.": 'الرسالة ماتبعتتش. شوف النت عندك.', "Couldn't send the photo. Try a smaller picture.": 'الصورة ماتبعتتش. جرّب صورة أصغر.',
+};
+for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
 const AR_CAT = { Bullet: 'بوليت', Blitz: 'بليتز', Rapid: 'رابيد', Classical: 'كلاسيك' };
 const AR_TAIL = s => s.replace(' · one device', ' · على جهاز واحد').replace(' · vs bot', ' · ضد بوت').replace(' · rated', ' · بتقييم');
 const AR_RX = [
+  [/^Last seen (.+)$/, (m, a) => 'آخر ظهور ' + a.replace('just now', 'من شوية').replace(/^(\d+) min ago$/, 'من $1 دقيقة').replace(/^(\d+) h ago$/, 'من $1 ساعة').replace(/^(\d+) d ago$/, 'من $1 يوم')],
+  [/^(\d+) online$/, (m, a) => `${a} أونلاين`],
+  [/^💬 (.+?): (.+)$/, (m, a, b) => `💬 ${a}: ${AR[b] || b}`],
   [/^Level (\d) · (.+)$/, (m, a, b) => `مستوى ${a} · ${AR[b] || b}`],
   [/^Level (\d) of 8$/, (m, a) => `مستوى ${a} من ٨`],
   [/^Play (.+) again$/, (m, a) => `العب مع ${a} تاني`],
@@ -2466,6 +2539,7 @@ function makeLocalDB() {
       async update(d) { if (!store[path]) throw { code: 'invalid_argument', message: 'missing document' }; merge(store[path], d); persist(); fire(); },
       async delete() { delete store[path]; persist(); fire(); },
       async acquire() { return { acquired: true }; },
+      async push(field, value, extra) { if (!store[path]) throw { code: 'invalid_argument', message: 'missing document' }; merge(store[path], extra || {}); const a = store[path][field] || []; if (!a.some(x => JSON.stringify(x) === JSON.stringify(value))) a.push(clone(value)); store[path][field] = a; persist(); fire(); },
       onSnapshot(next) { let last; const l = () => { const cur = JSON.stringify(store[path] ?? null); if (cur !== last) { last = cur; next(snap(path)); } }; listeners.add(l); queueMicrotask(l); return () => listeners.delete(l); },
       collection(sub) { return collRef(path + '/' + sub); },
     };
@@ -2505,6 +2579,15 @@ function makeFirebaseDB(fs) {
   const toFs = v => { if (v === null || v === undefined) return { nullValue: null }; if (typeof v === 'boolean') return { booleanValue: v }; if (typeof v === 'number') return Number.isSafeInteger(v) ? { integerValue: String(v) } : { doubleValue: v }; if (typeof v === 'string') return { stringValue: v }; if (Array.isArray(v)) return { arrayValue: { values: v.map(toFs) } }; return { mapValue: { fields: Object.fromEntries(Object.entries(v).filter(([, x]) => x !== undefined).map(([k, x]) => [k, toFs(x)])) } }; };
   const fromFs = x => { if (!x) return null; if ('nullValue' in x) return null; if ('booleanValue' in x) return x.booleanValue; if ('integerValue' in x) return Number(x.integerValue); if ('doubleValue' in x) return x.doubleValue; if ('stringValue' in x) return x.stringValue; if ('timestampValue' in x) return Date.parse(x.timestampValue); if ('arrayValue' in x) return (x.arrayValue.values || []).map(fromFs); if ('mapValue' in x) return Object.fromEntries(Object.entries(x.mapValue.fields || {}).map(([k, v]) => [k, fromFs(v)])); return null; };
   async function token() { const u = firebase.auth().currentUser; if (!u) throw { code: 'unauthenticated' }; return u.getIdToken(); }
+  async function restPush(path, field, value, extra) {
+    const name = `projects/${FB_CONFIG.projectId}/databases/(default)/documents/${path}`; const keys = Object.keys(extra);
+    const write = { update: { name, fields: Object.fromEntries(keys.map(k => [k, toFs(extra[k])])) }, updateMask: { fieldPaths: keys }, updateTransforms: [{ fieldPath: field, appendMissingElements: { values: [toFs(value)] } }], currentDocument: { exists: true } };
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 9000);
+    try { const r = await fetch(BASE.replace(/\/$/, '') + ':commit', { method: 'POST', headers: { Authorization: 'Bearer ' + await token(), 'Content-Type': 'application/json' }, body: JSON.stringify({ writes: [write] }), signal: ctl.signal });
+      if (r.status === 403 || r.status === 404 || r.status === 400) throw { code: 'invalid_argument', message: 'rest ' + r.status };
+      if (!r.ok) throw { code: 'unavailable', message: 'rest ' + r.status };
+    } finally { clearTimeout(tm); }
+  }
   async function restGet(path) {
     const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 6000);
     try { const r = await fetch(BASE + path, { headers: { Authorization: 'Bearer ' + await token() }, cache: 'no-store', signal: ctl.signal });
@@ -2539,11 +2622,15 @@ function makeFirebaseDB(fs) {
         const pairs = flatten(d, [], []); if (!pairs.length) return; const args = []; for (const [p, v] of pairs) args.push(new FP(...p), v); try { await r.update(...args); } catch (e) { throw err(e); } },
       async delete() { try { await r.delete(); } catch (e) { throw err(e); } },
       acquire: o => lease(path, o),
+      async push(field, value, extra) {
+        try { await restPush(path, field, value, extra || {}); return; } catch (e) { if (e && e.code === 'invalid_argument') throw e; }
+        try { await r.update({ ...(extra || {}), [field]: firebase.firestore.FieldValue.arrayUnion(value) }); } catch (e) { throw err(e); }
+      },
       onSnapshot(next, onErr) {
         let last = null; const deliver = sn => { const w = wrapDoc(sn); const k = JSON.stringify(w.exists ? w.data() : null); if (k === last) return; last = k; next(w); };
         const off = r.onSnapshot(sn => deliver(sn), e => onErr && onErr(err(e)));
         let busy = false;
-        const poll = /^(games|tournaments)\//.test(path) ? setInterval(() => { if (busy || document.visibilityState === 'hidden') return; busy = true; restGet(path).then(deliver).catch(() => {}).finally(() => { busy = false; }); }, path.startsWith('games/') ? 1500 : 5000) : null;
+        const poll = /^(games|tournaments|chats)\//.test(path) ? setInterval(() => { if (busy || document.visibilityState === 'hidden') return; busy = true; restGet(path).then(deliver).catch(() => {}).finally(() => { busy = false; }); }, path.startsWith('games/') ? 1500 : path.startsWith('chats/') ? 3000 : 5000) : null;
         return () => { off(); if (poll) clearInterval(poll); };
       },
       collection: sub => collRef(path + '/' + sub),
@@ -2582,7 +2669,7 @@ const S = {
   tRoom: null, gRoom: null, tPeers: [],
   local: null, modal: null, toast: null,
   shareSel: new Set(), loadedAt: now(), seenGames: new Set(), navDone: new Set(),
-  draft: null, frq: '', viewRound: null, bots: [], hint: null,
+  draft: null, frq: '', viewRound: null, bots: [], hint: null, chats: [], club: null, imgCache: {}, liveGames: [], drafts: {}, chatSeen: {},
 };
 const unsub = { tour: [], game: [] };
 
@@ -2651,6 +2738,20 @@ function startSubs() {
     }
     applyRatings(); render();
   }, subErr);
+  db.collection('games').where('status', '==', 'active').limit(60).onSnapshot(s => { S.liveGames = s.docs.map(d => ({ ...d.data(), id: d.id })); S.liveLoaded = true; render(); }, subErr);
+  if (S.mode === 'online') {
+    db.collection('chats').where('members', 'array-contains', S.uid).limit(300).onSnapshot(s => {
+      S.chats = s.docs.map(d => ({ ...d.data(), id: d.id }));
+      for (const c of S.chats) {
+        const seen = S.chatSeen[c.id];
+        if (c.id.startsWith('dm-') && c.lastAt && c.lastFrom !== S.uid && c.lastAt > S.loadedAt && (seen == null || c.lastAt > seen) && !(S.route.view === 'chat' && S.chatId === c.id)) toast('💬 ' + pname(c.lastFrom) + ': ' + (c.lastText || ''));
+        S.chatSeen[c.id] = c.lastAt || 0;
+      }
+      render();
+    }, subErr);
+    db.doc('chats/club').onSnapshot(s => { S.club = s.exists ? { ...s.data(), id: 'club' } : null; render(); }, () => {});
+    setTimeout(() => heartbeat(true), 500);
+  }
   db.collection('bots').limit(200).onSnapshot(s => { S.bots = s.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => a.createdAt - b.createdAt); render(); }, subErr);
   db.collection('tournaments').orderBy('startAt', 'desc').limit(100).onSnapshot(s => { S.tournaments = s.docs.map(d => ({ ...d.data(), id: d.id })); render(); }, subErr);
 }
@@ -2685,7 +2786,11 @@ async function applyRatings() {
 
 /* ---------- routing ---------- */
 function go(view, id) {
-  S.route = { view, id }; S.sel = null; S.promo = null; S.viewRound = null; S.viewPly = null;
+  if (S.route && (S.route.view !== view || S.route.id !== id)) S.prevRoute = S.route;
+  if (view !== 'chat') subChat(null);
+  if (view !== 'game') subGameChat(null);
+  S.route = { view, id }; S.sel = null; S.promo = null; S.viewRound = null; S.viewPly = null; S.emojiOpen = null;
+  setTimeout(() => heartbeat(true), 50);
   if (view !== 'game') S.flip = false;
   try {
     const h = view === 'tour' ? '#t-' + id : view === 'game' ? '#g-' + id : '#' + view;
@@ -2697,7 +2802,7 @@ function routeFromHash() {
   const h = (location.hash || '').slice(1);
   if (h.startsWith('t-')) return { view: 'tour', id: h.slice(2) };
   if (h.startsWith('g-')) return { view: 'game', id: h.slice(2) };
-  if (['play', 'tours', 'friends', 'bots', 'history'].includes(h)) return { view: h };
+  if (['play', 'tours', 'friends', 'bots', 'history', 'chat'].includes(h)) return { view: h };
   return { view: 'play' };
 }
 function syncContext() {
@@ -3185,7 +3290,7 @@ document.addEventListener('pointerdown', () => { try { if (!actx) actx = new (wi
 
 /* ---------- rendering ---------- */
 let rq = false, mountedKey = null;
-function render() { if (rq) return; rq = true; requestAnimationFrame(renderNow); }
+function render() { if (rq) return; rq = true; requestAnimationFrame(() => { renderNow(); try { heartbeat(false); } catch (e) {} }); }
 function toast(msg) { S.toast = { msg, at: now() }; renderToast(); setTimeout(() => { if (S.toast && now() - S.toast.at >= 3900) { S.toast = null; renderToast(); } }, 4000); }
 function renderToast() { $('#toast').innerHTML = S.toast ? `<div class="toast" role="status">${esc(S.toast.msg)}</div>` : ''; }
 function badgeCount() {
@@ -3195,7 +3300,7 @@ function badgeCount() {
 }
 function renderBar() {
   const v = S.route.view; const b = badgeCount();
-  const navv = ['tour', 'create', 'tours'].includes(v) ? 'tours' : ['friends'].includes(v) ? 'friends' : (v === 'bots' || (v === 'local' && S.local && S.local.bot && !S.local.histId)) ? 'bots' : 'play';
+  const navv = ['tour', 'create', 'tours'].includes(v) ? 'tours' : v === 'chat' ? 'chat' : ['friends', 'player'].includes(v) ? 'friends' : (v === 'bots' || (v === 'local' && S.local && S.local.bot && !S.local.histId)) ? 'bots' : 'play';
   const me = S.me;
   const cat = tcCat(S.tc[0], S.tc[1]);
   $('#bar').innerHTML = `
@@ -3205,6 +3310,7 @@ function renderBar() {
       <button data-act="nav" data-v="bots" ${navv === 'bots' ? 'aria-current="page"' : ''}>Bots</button>
       <button data-act="nav" data-v="tours" ${navv === 'tours' ? 'aria-current="page"' : ''}>Tournaments</button>
       <button data-act="nav" data-v="friends" ${navv === 'friends' ? 'aria-current="page"' : ''}>Friends${b.fr ? `<span class="dot">${b.fr}</span>` : ''}</button>
+      ${S.mode === 'online' ? `<button data-act="nav" data-v="chat" ${navv === 'chat' ? 'aria-current="page"' : ''}>Chat 64${chatUnreadCount() ? `<span class="dot">${chatUnreadCount()}</span>` : ''}</button>` : ''}
     </nav>`}
     ${me ? `<button class="me-chip" data-act="account" style="background:none;border:0;cursor:pointer;padding:0" aria-label="Account"><span class="av">${esc((me.username || '?')[0].toUpperCase())}</span><span class="nm">${esc(me.username)}</span><span class="rt pill mono" title="${CAT_NAME[cat]} rating">${CAT_NAME[cat]} ${rating(S.uid, cat)}</span></button>` : ''}
     <button class="iconbtn langbtn ${me ? '' : 'push'}" data-act="lang" aria-label="${LANG === 'ar' ? 'Switch to English' : 'Switch to Arabic'}" title="${LANG === 'ar' ? 'English' : 'عربي'}">${LANG === 'ar' ? 'EN' : 'ع'}</button>
@@ -3407,6 +3513,7 @@ VIEWS.play = {
         <section class="card"><div class="spread" style="margin-bottom:8px"><h2>Your games</h2><button class="btn sm" data-act="nav" data-v="history">All games</button></div>${myGamesHTML()}</section>
       </div>
       <div class="stack">
+        ${onlineFriendsHTML()}
         <section class="card"><h2>Invitations</h2>${inboxHTML()}</section>
         <section class="card"><div class="spread" style="margin-bottom:8px"><h2>Your tournaments</h2><button class="btn sm" data-act="nav" data-v="create">Create</button></div>
           ${upcoming.length ? `<div>${upcoming.map(tourCard).join('')}</div>` : `<div class="empty">You haven't joined a tournament yet.</div>`}</section>
@@ -3830,14 +3937,16 @@ VIEWS.game = {
       <div class="bcol">${pbar(nm(top), rt(top), 'clk-' + top, top, '', viewChess(c))}<div class="boardwrap ${col && turn === col && g.status === 'active' ? 'mine-turn' : ''}" id="boardwrap">${boardHTML()}</div>${pbar(nm(orient), rt(orient), 'clk-' + orient, orient, '', viewChess(c))}</div>
       <aside class="side">
         <div class="spread"><span class="pill mono">${fmtTC(g.base, g.inc)}${g.rated ? ' · rated' : ''}</span>${T ? `<button class="btn sm" data-act="open-tour" data-id="${T.id}">${esc(T.name)} →</button>` : ''}</div>
+        ${!col && !g.manual && g.status === 'active' ? `<div class="banner info">👀 You're watching <span class="pl" data-act="player" data-u="${esc(g.white)}"><b>${esc(nm('w'))}</b></span> vs <span class="pl" data-act="player" data-u="${esc(g.black)}"><b>${esc(nm('b'))}</b></span></div>` : ''}
         ${status}${actions}
         <div id="resign-confirm"></div>
+        ${(subGameChat(g), gameChatHTML(g))}
         ${movesHTML(g.moves || [])}
-        ${exportHTML(g.status === 'finished' && (g.moves || []).length > 0)}
+        ${exportHTML((g.status === 'finished' || !col) && (g.moves || []).length > 0)}
         ${g.status === 'finished' && T && T.status === 'running' ? `<button class="btn primary" data-act="open-tour" data-id="${T.id}">Back to the tournament</button>` : ''}
       </aside></div>`;
   },
-  mount() { bindBoard(); const mv = $('#moves'); if (mv) { if (viewing()) keepCur('#moves'); else mv.scrollTop = mv.scrollHeight; } },
+  mount() { bindBoard(); const mv = $('#moves'); if (mv) { if (viewing()) keepCur('#moves'); else mv.scrollTop = mv.scrollHeight; } const gc = $('#gcmsgs'); if (gc) gc.scrollTop = gc.scrollHeight; },
 };
 VIEWS.local = {
   html() {
@@ -3910,6 +4019,233 @@ VIEWS.history = {
   },
 };
 
+/* ---------- presence (online / playing) ---------- */
+const ONLINE_MS = 150000;
+function presenceOf(uid) {
+  const p = S.profiles[uid]; if (!p || !p.lastSeen || p.away) return 'off';
+  if (now() - p.lastSeen > ONLINE_MS) return 'off';
+  if (p.playing && S.liveLoaded && !(S.liveGames || []).some(g => g.id === p.playing)) return 'online';
+  return p.playing ? 'playing' : 'online';
+}
+function odot(uid) { const st = presenceOf(uid); return st === 'off' ? '' : `<span class="odot ${st}" title="${st === 'playing' ? 'Playing now' : 'Online'}" aria-label="${st === 'playing' ? 'Playing now' : 'Online'}"></span>`; }
+function statusText(uid) { const st = presenceOf(uid); if (st === 'playing') return 'Playing now'; if (st === 'online') return 'Online'; const p = S.profiles[uid]; return p && p.lastSeen ? 'Last seen ' + agoText(p.lastSeen) : 'Offline'; }
+function agoText(ts) { const m = Math.round((now() - ts) / 60000); if (m < 2) return 'just now'; if (m < 60) return m + ' min ago'; const h = Math.round(m / 60); if (h < 24) return h + ' h ago'; return Math.round(h / 24) + ' d ago'; }
+let hbLast = { key: null, at: 0 };
+function heartbeat(force) {
+  if (S.mode !== 'online' || !S.uid || !S.me || document.visibilityState === 'hidden') return;
+  const playing = S.route.view === 'game' && S.game && S.game.status === 'active' && !S.game.manual && S.game.players.includes(S.uid) ? S.game.id : null;
+  const key = playing || '-'; const t = now();
+  if (!force && hbLast.key === key && t - hbLast.at < 60000) return;
+  hbLast = { key, at: t };
+  S.db.doc('profiles/' + S.uid).update({ lastSeen: t, playing, away: false }).catch(() => {});
+}
+document.addEventListener('visibilitychange', () => {
+  if (S.mode !== 'online' || !S.uid || !S.me) return;
+  if (document.visibilityState === 'hidden') { hbLast = { key: null, at: 0 }; S.db.doc('profiles/' + S.uid).update({ away: true }).catch(() => {}); }
+  else heartbeat(true);
+});
+setInterval(() => heartbeat(false), 15000);
+
+/* ---------- live games & player profiles ---------- */
+function liveGames() { return (S.liveGames || []).filter(g => g.status === 'active' && !g.manual && !g.players.includes(S.uid)); }
+function liveRow(g) {
+  const T = g.tid ? S.tournaments.find(t => t.id === g.tid) : null;
+  return `<div class="li"><div class="grow"><div class="t"><span class="pl" data-act="player" data-u="${esc(g.white)}">${esc(pname(g.white, T))}</span> <span class="muted">vs</span> <span class="pl" data-act="player" data-u="${esc(g.black)}">${esc(pname(g.black, T))}</span></div><div class="small muted">${fmtTC(g.base, g.inc)}${T ? ' · ' + esc(T.name) : ''} · ${(g.moves || []).length} moves</div></div><button class="btn sm primary" data-act="open-game" data-id="${g.id}">Watch</button></div>`;
+}
+function onlineFriendsHTML() {
+  if (S.mode !== 'online') return '';
+  const fr = S.friends.filter(f => f.status === 'accepted').map(f => f.members.find(m => m !== S.uid));
+  const on = fr.filter(u => presenceOf(u) !== 'off').sort((a, b) => (presenceOf(a) === 'playing') - (presenceOf(b) === 'playing'));
+  const live = liveGames();
+  return `<section class="card stack"><div class="spread"><h2>Friends online</h2><span class="pill">${on.length} online</span></div>
+    ${on.length ? `<div class="list">${on.map(u => { const p = S.profiles[u]; const g = p && p.playing; return `<div class="li"><span class="pl" data-act="player" data-u="${esc(u)}">${odot(u)}<b>${esc(pname(u))}</b></span><div class="grow small muted">${presenceOf(u) === 'playing' ? 'Playing now' : 'Online'}</div>${g ? `<button class="btn sm primary" data-act="open-game" data-id="${esc(g)}">Watch</button>` : `<button class="btn sm" data-act="challenge" data-u="${esc(u)}">Challenge</button>`}<button class="btn sm" data-act="chat-with" data-u="${esc(u)}" aria-label="Chat">💬</button></div>`; }).join('')}</div>` : '<div class="empty">None of your friends are online right now.</div>'}
+    ${live.length ? `<h3>Live now</h3><div class="list">${live.slice(0, 8).map(liveRow).join('')}</div>` : ''}</section>`;
+}
+function playerGamesRow(g, uid) {
+  const T = g.tid ? S.tournaments.find(t => t.id === g.tid) : null; const col = g.white === uid ? 'w' : 'b';
+  const opp = col === 'w' ? g.black : g.white;
+  const out = g.status === 'active' ? 'Live' : g.result === '1/2-1/2' ? 'Draw' : g.result === '*' ? 'Aborted' : ((g.result === '1-0') === (col === 'w')) ? 'Won' : 'Lost';
+  const xp = exportFromOnline(g); const d = new Date(g.finishedAt || g.createdAt || now());
+  return `<div class="hrow"><div class="hmain"><span class="sq-dot ${col}"></span><div class="grow"><div class="t">vs <span class="pl" data-act="player" data-u="${esc(opp)}">${esc(pname(opp, T))}</span></div><div class="small muted">${fmtTC(g.base, g.inc)}${T ? ' · ' + esc(T.name) : ''}</div><div class="small muted">${d.toLocaleDateString(LANG === 'ar' ? 'ar-EG' : undefined, { day: 'numeric', month: 'short', year: 'numeric' })} · ${xp.sans.length} moves</div></div><span class="pill ${out === 'Won' || out === 'Live' ? 'live' : out === 'Lost' ? 'bad' : 'done'}" style="animation:none">${out}</span></div>
+    <div class="hacts"><button class="btn sm ${g.status === 'active' ? 'primary' : ''}" data-act="open-game" data-id="${g.id}">${g.status === 'active' ? 'Watch' : 'View'}</button>${xp.sans.length ? `<button class="btn sm" data-act="pg-pgn" data-id="${g.id}">Copy PGN</button><a class="btn sm lichess" href="${esc(lichessURL(xp, true))}" target="_blank" rel="noopener">Lichess ↗</a>` : ''}</div></div>`;
+}
+async function loadPlayerGames(uid, force) {
+  S.pgames = S.pgames || {};
+  if (S.pgames[uid] && !force && now() - S.pgames[uid].at < 30000) return;
+  S.pgames[uid] = { at: now(), list: (S.pgames[uid] && S.pgames[uid].list) || null, loading: true }; render();
+  try {
+    const sn = await S.db.collection('games').where('players', 'array-contains', uid).orderBy('createdAt', 'desc').limit(150).get();
+    S.pgames[uid] = { at: now(), list: sn.docs.map(d => ({ ...d.data(), id: d.id })).filter(g => !g.manual && (g.status === 'active' || (g.moves || []).length)), loading: false };
+  } catch (e) { S.pgames[uid] = { at: now(), list: [], loading: false, err: true }; }
+  render();
+}
+VIEWS.player = {
+  html() {
+    const uid = S.route.id; const p = S.profiles[uid];
+    if (!p) return `<div class="empty">This player doesn't exist. <button class="btn sm" data-act="nav" data-v="friends">Back</button></div>`;
+    if (!S.pgames || !S.pgames[uid]) setTimeout(() => loadPlayerGames(uid), 0);
+    const pg = S.pgames && S.pgames[uid]; const games = (pg && pg.list) || [];
+    const f = S.friends.find(x => x.members.includes(uid) && x.members.includes(S.uid)); const me = uid === S.uid;
+    const fbtn = me ? '' : !f ? `<button class="btn primary" data-act="fr-add" data-u="${esc(uid)}">Add friend</button>` : f.status === 'accepted' ? `<button class="btn primary" data-act="challenge" data-u="${esc(uid)}">Challenge</button>` : f.from === S.uid ? `<span class="pill">Friend request sent</span>` : `<button class="btn primary" data-act="fr-accept" data-id="${f.id}">Accept friend request</button>`;
+    const fin = games.filter(g => g.status === 'finished'); const won = fin.filter(g => (g.result === '1-0' && g.white === uid) || (g.result === '0-1' && g.black === uid)).length; const drawn = fin.filter(g => g.result === '1/2-1/2').length;
+    const live = games.find(g => g.status === 'active');
+    return `<div class="stack"><button class="btn sm" data-act="back" style="align-self:flex-start">← Back</button>
+      <section class="card"><div class="phead"><span class="pav">${esc((p.username || '?')[0].toUpperCase())}${odot(uid)}</span><div class="grow"><h1>${esc(p.username)}${me ? ' <span class="small muted">(you)</span>' : ''}</h1><div class="small muted">${statusText(uid)}</div></div></div>
+        <div class="pstats">${['bullet', 'blitz', 'rapid'].map(c => `<div><span class="label">${CAT_NAME[c]}</span><b class="mono">${rating(uid, c)}</b></div>`).join('')}<div><span class="label">Games</span><b class="mono">${fin.length}</b></div><div><span class="label">Won</span><b class="mono">${won}</b></div><div><span class="label">Drawn</span><b class="mono">${drawn}</b></div></div>
+        <div class="row" style="margin-top:12px">${fbtn}${!me ? `<button class="btn" data-act="chat-with" data-u="${esc(uid)}">💬 Chat</button>` : ''}${live ? `<button class="btn" data-act="open-game" data-id="${live.id}">Watch live game</button>` : ''}</div></section>
+      <section class="card stack"><div class="spread"><h2>Games</h2><button class="btn sm" data-act="pg-refresh" data-u="${esc(uid)}">Refresh</button></div>
+        ${!pg || (pg.loading && !pg.list) ? '<div class="empty">Loading games…</div>' : games.length ? `<div class="hlist">${games.map(g => playerGamesRow(g, uid)).join('')}</div>` : '<div class="empty">No games yet.</div>'}</section></div>`;
+  },
+};
+
+/* ---------- Chat 64 ---------- */
+const EMOJIS = ['😀', '😂', '🤣', '😅', '😎', '😍', '🥳', '😮', '🤔', '😬', '😭', '😡', '👍', '👎', '👏', '🙏', '🤝', '💪', '🔥', '⚡', '🎉', '❤️', '💯', '👀', '😴', '🤯', '🫡', '♟️', '👑', '🏆', '⏰', '🍀'];
+const QUICK = ['Hi 👋', 'Good luck 🍀', 'Good move 👍', 'Sorry 🙏', 'Oops 😅', 'Thanks 🙏', 'Wow 😮', 'Well played 🤝', 'Good game 🤝', 'Rematch? 🔁'];
+const chatIdFor = u => 'dm-' + pairId(S.uid, u);
+function chatTitle(c) { if (!c) return ''; if (c.id === 'club') return 'Club 64 room'; const u = (c.members || []).find(m => m !== S.uid); return pname(u); }
+function chatOther(c) { return c && c.id !== 'club' ? (c.members || []).find(m => m !== S.uid) : null; }
+function unreadOf(c) { if (!c || !c.lastAt || c.lastFrom === S.uid) return false; return c.lastAt > ((c.read || {})[S.uid] || 0); }
+function chatUnreadCount() { if (S.mode !== 'online') return 0; let n = S.chats.filter(c => c.id.startsWith('dm-') && unreadOf(c)).length; if (S.club && unreadOf(S.club)) n++; return n; }
+async function dbPush(path, field, value, extra) {
+  const r = S.db.doc(path);
+  if (r.push) return r.push(field, value, extra);
+  const sn = await r.get(); const d = sn.exists ? sn.data() : {};
+  await r.update({ ...extra, [field]: [...(d[field] || []), value] });
+}
+async function ensureChat(id, members) {
+  const r = S.db.doc('chats/' + id); let ex = false;
+  try { const sn = await r.get(); ex = sn.exists; } catch (e) { ex = false; }
+  if (!ex) await r.set(id === 'club' ? { kind: 'club', msgs: [], lastAt: 0, read: {} } : { kind: id.startsWith('g-') ? 'game' : 'dm', members, msgs: [], lastAt: 0, read: {} });
+}
+async function sendChat(id, members, msg) {
+  const m = { id: rid(10), from: S.uid, at: now(), ...msg };
+  const preview = m.img ? '📷 Photo' : String(m.t || '').slice(0, 80);
+  const local = id === S.chatId ? 'chatDoc' : (S.gchat && S.gchat.id === id ? 'gchat' : null);
+  if (local && S[local]) { S[local] = { ...S[local], msgs: [...(S[local].msgs || []), m], lastAt: m.at, lastFrom: S.uid }; render(); }
+  try {
+    try { await dbPush('chats/' + id, 'msgs', m, { lastAt: m.at, lastFrom: S.uid, lastText: preview }); }
+    catch (e) { await ensureChat(id, members); await dbPush('chats/' + id, 'msgs', m, { lastAt: m.at, lastFrom: S.uid, lastText: preview }); }
+  } catch (e) { console.warn(e); toast("Couldn't send the message. Check your internet."); }
+}
+async function imgToDataURL(file, max = 1024, q = .72) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    let w = img.naturalWidth, h = img.naturalHeight; const sc = Math.min(1, max / Math.max(w, h)); w = Math.round(w * sc); h = Math.round(h * sc);
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(img, 0, 0, w, h);
+    let out = cv.toDataURL('image/jpeg', q); if (out.length > 700000) out = cv.toDataURL('image/jpeg', .5);
+    return out;
+  } finally { URL.revokeObjectURL(url); }
+}
+async function sendPhoto(id, members, file) {
+  try {
+    const data = await imgToDataURL(file);
+    const imgId = 'i' + rid(12);
+    await S.db.doc('chatimgs/' + imgId).set(id === 'club' ? { club: true, from: S.uid, data, at: now() } : { members, from: S.uid, data, at: now() });
+    S.imgCache[imgId] = data; await sendChat(id, members, { img: imgId });
+  } catch (e) { console.warn(e); toast("Couldn't send the photo. Try a smaller picture."); }
+}
+function loadImg(id) {
+  if (S.imgCache[id] !== undefined) return;
+  S.imgCache[id] = null;
+  S.db.doc('chatimgs/' + id).get().then(sn => { S.imgCache[id] = sn.exists ? sn.data().data : ''; render(); }).catch(() => { S.imgCache[id] = ''; });
+}
+function bubbleHTML(m, showName) {
+  const mine = m.from === S.uid; const tm = new Date(m.at).toLocaleTimeString(LANG === 'ar' ? 'ar-EG' : undefined, { hour: '2-digit', minute: '2-digit' });
+  let body;
+  if (m.img) { const d = S.imgCache[m.img]; if (d === undefined) loadImg(m.img); body = d ? `<img class="cimg" src="${esc(d)}" alt="Photo" data-act="img-open" data-id="${esc(m.img)}">` : `<span class="small muted">📷 Loading photo…</span>`; }
+  else body = `<span class="ctext" data-notr>${esc(m.t || '')}</span>`;
+  const big = !m.img && /^(\p{Extended_Pictographic}|️|‍|\s){1,6}$/u.test(m.t || '');
+  return `<div class="bub ${mine ? 'me' : ''} ${big ? 'big' : ''}">${showName && !mine ? `<span class="bname pl" data-act="player" data-u="${esc(m.from)}">${esc(pname(m.from))}</span>` : ''}${body}<span class="btime">${tm}</span></div>`;
+}
+function subChat(id) {
+  if (S.chatSubId === id) return;
+  if (S.chatUnsub) { try { S.chatUnsub(); } catch (e) {} S.chatUnsub = null; }
+  S.chatSubId = id; S.chatDoc = null; if (!id) return;
+  S.chatUnsub = S.db.doc('chats/' + id).onSnapshot(sn => {
+    if (S.chatSubId !== id) return;
+    const d = sn.exists ? { ...sn.data(), id } : { id, msgs: [], missing: true };
+    if (S.chatDoc && (S.chatDoc.msgs || []).length > (d.msgs || []).length && S.chatDoc.lastAt >= (d.lastAt || 0)) return;
+    S.chatDoc = d; markRead(id, d); render();
+  }, () => { if (S.chatSubId === id) { S.chatDoc = { id, msgs: [], missing: true }; render(); } });
+}
+function markRead(id, d) {
+  if (!d || d.missing || !d.lastAt || d.lastFrom === S.uid || document.visibilityState === 'hidden') return;
+  if (((d.read || {})[S.uid] || 0) >= d.lastAt) return;
+  S.db.doc('chats/' + id).update({ read: { [S.uid]: now() } }).catch(() => {});
+  if ((d.msgs || []).length > 220) S.db.doc('chats/' + id).update({ msgs: d.msgs.slice(-180) }).catch(() => {});
+}
+function chatListHTML() {
+  const dms = S.chats.filter(c => c.id.startsWith('dm-') && (c.lastAt || c.id === S.chatId)).sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0));
+  const row = (c, title, sub, extra) => `<button class="crow ${S.chatId === c.id ? 'on' : ''}" data-act="chat-open" data-id="${esc(c.id)}">${extra}<span class="grow"><span class="t">${esc(title)}</span><span class="small muted cprev">${esc(sub || '')}</span></span>${unreadOf(c) ? '<span class="dot static">•</span>' : ''}</button>`;
+  const club = S.club || { id: 'club' };
+  return `<div class="clist">${row(club, 'Club 64 room', club.lastText ? `${club.lastFrom === S.uid ? 'You' : pname(club.lastFrom)}: ${club.lastText}` : 'Everyone in the club', '<span class="cav club">64</span>')}
+    ${dms.map(c => { const u = chatOther(c); return row(c, pname(u), c.lastText ? (c.lastFrom === S.uid ? 'You: ' : '') + c.lastText : 'Say hi 👋', `<span class="cav">${esc(pname(u)[0].toUpperCase())}${odot(u)}</span>`); }).join('')}
+    ${!dms.length ? '<div class="empty small" style="margin-top:8px">No private chats yet. Tap New chat to message a friend.</div>' : ''}</div>`;
+}
+function composerHTML(prefix) {
+  return `<div class="composer" data-cp="${prefix}">${S.emojiOpen === prefix ? `<div class="emgrid">${EMOJIS.map(e => `<button data-act="emoji" data-e="${e}" data-cp="${prefix}">${e}</button>`).join('')}</div>` : ''}
+    <div class="crow2"><button class="iconbtn" data-act="emoji-toggle" data-cp="${prefix}" aria-label="Emojis">😊</button>${prefix === 'chat' ? `<label class="iconbtn" for="ph-${prefix}" aria-label="Send a photo" title="Send a photo">📷</label><input id="ph-${prefix}" type="file" accept="image/*" hidden data-photo="${prefix}">` : ''}<input id="tx-${prefix}" type="text" maxlength="1000" placeholder="Type a message" autocomplete="off" value="${esc((S.drafts || {})[prefix] || '')}" data-draft="${prefix}"><button class="btn primary" data-act="send" data-cp="${prefix}">Send</button></div></div>`;
+}
+VIEWS.chat = {
+  html() {
+    if (S.mode !== 'online') return `<div class="empty">Chat 64 works in the online version.</div>`;
+    const id = S.chatId; subChat(id);
+    const d = S.chatDoc && S.chatDoc.id === id ? S.chatDoc : null;
+    let conv = '';
+    if (S.chatPick) {
+      const q = (S.chatQ || '').trim().toLowerCase();
+      const ps = Object.values(S.profiles).filter(p => p.id !== S.uid && (!q || (p.lower || '').includes(q))).sort((a, b) => (presenceOf(b.id) !== 'off') - (presenceOf(a.id) !== 'off') || (a.lower || '').localeCompare(b.lower || '')).slice(0, 40);
+      conv = `<div class="conv"><div class="chead"><button class="btn sm" data-act="chat-pick-close">←</button><b>New chat</b></div><div class="cbody stack"><input id="chat-q" type="text" placeholder="Search a username" value="${esc(S.chatQ || '')}" autocomplete="off"><div class="list">${ps.map(p => `<button class="crow" data-act="chat-with" data-u="${esc(p.id)}"><span class="cav">${esc(p.username[0].toUpperCase())}${odot(p.id)}</span><span class="grow"><span class="t">${esc(p.username)}</span><span class="small muted">${statusText(p.id)}</span></span></button>`).join('') || '<div class="empty">No players found.</div>'}</div></div></div>`;
+    } else if (id) {
+      const other = id === 'club' ? null : (d && chatOther(d)) || (S.chatWith || null);
+      const msgs = (d && d.msgs) || [];
+      conv = `<div class="conv"><div class="chead"><button class="btn sm cback" data-act="chat-close" aria-label="Back to chats">←</button>${other ? `<span class="pl" data-act="player" data-u="${esc(other)}"><span class="cav">${esc(pname(other)[0].toUpperCase())}${odot(other)}</span><span><b>${esc(pname(other))}</b><span class="small muted" style="display:block">${statusText(other)}</span></span></span>` : '<span class="cav club">64</span><span><b>Club 64 room</b><span class="small muted" style="display:block">Everyone in the club can read this</span></span>'}</div>
+        <div class="cbody" id="cbody">${!d ? '<div class="empty">Loading…</div>' : msgs.length ? msgs.map(m => bubbleHTML(m, id === 'club')).join('') : '<div class="empty">No messages yet. Say hi 👋</div>'}</div>${composerHTML('chat')}</div>`;
+    } else conv = `<div class="conv empty-conv"><div class="empty">Pick a chat, or start a new one.</div></div>`;
+    return `<div class="chatwrap ${id || S.chatPick ? 'has-conv' : ''}"><aside class="chatside"><div class="spread"><h2>Chat 64</h2><button class="btn sm primary" data-act="chat-new">New chat</button></div>${chatListHTML()}</aside>${conv}</div>`;
+  },
+  mount() { const b = $('#cbody'); if (b) b.scrollTop = b.scrollHeight; const q = $('#chat-q'); if (q) { q.addEventListener('input', () => { S.chatQ = q.value; const pos = q.selectionStart; mountedKey = null; renderNow(); const n = $('#chat-q'); if (n) { n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} } }); } },
+};
+
+/* in-game quick chat */
+function subGameChat(g) {
+  const id = g && !g.manual && g.players.includes(S.uid) && S.mode === 'online' ? 'g-' + g.id : null;
+  if (S.gchatId === id) return;
+  if (S.gchatUnsub) { try { S.gchatUnsub(); } catch (e) {} S.gchatUnsub = null; }
+  S.gchatId = id; S.gchat = null; S.gchatSeen = 0; if (!id) return;
+  S.gchatUnsub = S.db.doc('chats/' + id).onSnapshot(sn => {
+    if (S.gchatId !== id) return;
+    const d = sn.exists ? { ...sn.data(), id } : { id, msgs: [] };
+    if (S.gchat && (S.gchat.msgs || []).length > (d.msgs || []).length) return;
+    const prevN = S.gchat ? (S.gchat.msgs || []).length : null; S.gchat = d;
+    const last = (d.msgs || [])[d.msgs.length - 1];
+    if (prevN != null && d.msgs.length > prevN && last && last.from !== S.uid) { toast('💬 ' + pname(last.from) + ': ' + (last.t || '📷')); }
+    render();
+  }, () => {});
+}
+function gameChatHTML(g) {
+  if (!S.gchatId || S.gchatId !== 'g-' + g.id) return '';
+  const msgs = ((S.gchat && S.gchat.msgs) || []).slice(-30);
+  return `<section class="gchat"><div class="label">Chat 64</div><div class="gcmsgs" id="gcmsgs">${msgs.length ? msgs.map(m => bubbleHTML(m, false)).join('') : '<div class="small muted">Say something nice 🙂</div>'}</div>
+    <div class="qchips">${QUICK.map(q => `<button class="chip qc" data-act="quick" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>${composerHTML('game')}</section>`;
+}
+function chatTarget(cp) {
+  if (cp === 'game') { const g = S.game; return g ? { id: 'g-' + g.id, members: [g.white, g.black] } : null; }
+  if (!S.chatId) return null;
+  if (S.chatId === 'club') return { id: 'club', members: null };
+  const d = S.chatDoc; const other = (d && chatOther(d)) || S.chatWith; return { id: S.chatId, members: [S.uid, other].sort() };
+}
+function doSend(cp) {
+  const inp = $('#tx-' + cp); const text = (inp ? inp.value : '').trim(); if (!text) return;
+  const tg = chatTarget(cp); if (!tg) return;
+  S.drafts = S.drafts || {}; S.drafts[cp] = ''; if (inp) inp.value = ''; S.emojiOpen = null;
+  sendChat(tg.id, tg.members, { t: text.slice(0, 1000) });
+}
+document.addEventListener('keydown', e => { const t = e.target; if (e.key === 'Enter' && t && t.dataset && t.dataset.draft) { e.preventDefault(); doSend(t.dataset.draft); } });
+document.addEventListener('input', e => { const t = e.target; if (t && t.dataset && t.dataset.draft) { S.drafts = S.drafts || {}; S.drafts[t.dataset.draft] = t.value; } });
+document.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.photo) { const f = t.files && t.files[0]; t.value = ''; if (!f) return; const tg = chatTarget(t.dataset.photo); if (tg) sendPhoto(tg.id, tg.members, f); } });
+
 /* friends */
 VIEWS.friends = {
   html() {
@@ -3927,9 +4263,9 @@ VIEWS.friends = {
     const res = q ? Object.values(S.profiles).filter(p => p.id !== S.uid && (p.lower || '').includes(q)).slice(0, 12) : [];
     const cat = tcCat(S.tc[0], S.tc[1]);
     $('#fr-results').innerHTML = S.mode !== 'online' ? `<div class="empty">Friends work in the online version, where other players have accounts.</div>` : !q ? `<p class="small muted">${Object.keys(S.profiles).length - 1} other player${Object.keys(S.profiles).length === 2 ? '' : 's'} on Club 64.</p>` : res.length ? `<div class="list">${res.map(p => { const f = fmap[p.id]; const btn = !f ? `<button class="btn sm primary" data-act="fr-add" data-u="${esc(p.id)}">Add friend</button>` : f.status === 'accepted' ? `<span class="pill">Friends</span>` : f.from === S.uid ? `<span class="pill">Requested</span>` : `<button class="btn sm primary" data-act="fr-accept" data-id="${f.id}">Accept</button>`;
-      return `<div class="li"><span class="av" style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800">${esc(p.username[0].toUpperCase())}</span><div class="grow"><div class="t">${esc(p.username)}</div><div class="small muted mono">${CAT_NAME[cat]} ${rating(p.id, cat)}</div></div>${btn}</div>`; }).join('')}</div>` : `<div class="empty">No player called “${esc(S.frq.trim())}”.</div>`;
+      return `<div class="li"><span class="av" style="width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:800">${esc(p.username[0].toUpperCase())}</span><div class="grow"><div class="t"><span class="pl" data-act="player" data-u="${esc(p.id)}">${odot(p.id)}${esc(p.username)}</span></div><div class="small muted mono">${CAT_NAME[cat]} ${rating(p.id, cat)}</div></div>${btn}</div>`; }).join('')}</div>` : `<div class="empty">No player called “${esc(S.frq.trim())}”.</div>`;
     const acc = S.friends.filter(f => f.status === 'accepted');
-    $('#fr-list').innerHTML = `<h2>Your friends</h2>${acc.length ? `<div class="list">${acc.map(f => { const u = f.members.find(m => m !== S.uid); return `<div class="li"><div class="grow"><div class="t">${esc(pname(u))}</div><div class="small muted mono">${CAT_NAME[cat]} ${rating(u, cat)}</div></div><button class="btn sm primary" data-act="challenge" data-u="${esc(u)}">Challenge</button><button class="btn sm" data-act="fr-remove" data-id="${f.id}" aria-label="Remove friend">Remove</button></div>`; }).join('')}</div>` : `<div class="empty">Search for a username to send your first friend request.</div>`}`;
+    $('#fr-list').innerHTML = `<h2>Your friends</h2>${acc.length ? `<div class="list">${acc.map(f => { const u = f.members.find(m => m !== S.uid); const pl = S.profiles[u] && S.profiles[u].playing; return `<div class="li"><div class="grow"><div class="t"><span class="pl" data-act="player" data-u="${esc(u)}">${odot(u)}${esc(pname(u))}</span></div><div class="small muted"><span class="mono">${CAT_NAME[cat]} ${rating(u, cat)}</span> · <span>${statusText(u)}</span></div></div>${pl && presenceOf(u) === 'playing' ? `<button class="btn sm" data-act="open-game" data-id="${esc(pl)}">Watch</button>` : ''}<button class="btn sm" data-act="chat-with" data-u="${esc(u)}" aria-label="Chat">💬</button><button class="btn sm primary" data-act="challenge" data-u="${esc(u)}">Challenge</button><button class="btn sm" data-act="fr-remove" data-id="${f.id}" aria-label="Remove friend">Remove</button></div>`; }).join('')}</div>` : `<div class="empty">Search for a username to send your first friend request.</div>`}`;
     const inc = S.friends.filter(f => f.status === 'pending' && f.to === S.uid), out = S.friends.filter(f => f.status === 'pending' && f.from === S.uid);
     $('#fr-req').innerHTML = `<h2>Requests</h2>${inc.length ? `<div class="list">${inc.map(f => `<div class="li"><div class="grow"><div class="t">${esc(pname(f.from))}</div><div class="small muted">wants to be friends</div></div><button class="btn sm primary" data-act="fr-accept" data-id="${f.id}">Accept</button><button class="btn sm" data-act="fr-remove" data-id="${f.id}">Decline</button></div>`).join('')}</div>` : '<div class="empty">No pending requests.</div>'}
       ${out.length ? `<h3 style="margin-top:14px">Sent</h3><div class="list">${out.map(f => `<div class="li"><div class="grow"><div class="t">${esc(pname(f.to))}</div><div class="small muted">Waiting for them to accept</div></div><button class="btn sm" data-act="fr-remove" data-id="${f.id}">Cancel</button></div>`).join('')}</div>` : ''}`;
@@ -3973,7 +4309,7 @@ function renderModal() {
       ${m.owner ? `<form id="rs-form" class="stack"><div class="label">Reset a member's password</div><p class="small muted" style="margin:0">Only you see this, as the owner. Use it when a friend forgets their password.</p>
         <input id="rs-user" type="text" placeholder="Their username" autocapitalize="none" required><input id="rs-pw" type="text" placeholder="Temporary password (6+ characters)" required>
         <p class="small" id="rs-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Reset password</button></form>` : ''}
-      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 10</p></div></div>`;
+      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 11</p></div></div>`;
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
       const cur = $('#pw-cur').value, nw = $('#pw-new').value; if (nw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
@@ -3990,6 +4326,7 @@ function renderModal() {
     });
     return;
   }
+  if (m.type === 'img') { root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in imgmodal" role="dialog" aria-label="Photo"><img src="${esc(m.src)}" alt="Photo"><button class="btn" data-act="modal-close">Close</button></div></div>`; return; }
   if (m.type === 'copy') {
     root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="Copy ${esc(m.title)}"><h2>Copy ${esc(m.title)}</h2><textarea id="copy-ta" readonly rows="${m.title === 'PGN' ? 10 : 3}" class="copyta">${esc(m.text)}</textarea><div class="row"><button class="btn primary" data-act="copy-sel">Copy</button><button class="btn" data-act="modal-close">Close</button></div></div></div>`;
     setTimeout(() => { const t = $('#copy-ta'); if (t) { t.focus(); t.select(); } }, 30); return;
@@ -4057,6 +4394,20 @@ const ACTIONS = {
   'promo-cancel': () => { S.promo = null; S.sel = null; drawBoard(); },
   lang: () => { LANG = LANG === 'ar' ? 'en' : 'ar'; lsSet('club64-lang', LANG); applyLang(); mountedKey = null; renderNow(); renderModal(); trTree(document.body); toast(LANG === 'ar' ? 'أهلاً بيك! كده إحنا بنتكلم مصري 😎' : 'Switched to English.'); },
   theme: () => { lsSet('club64-theme', curTheme() === 'dark' ? 'light' : 'dark'); applyTheme(); renderBar(); },
+  player: el => { if (el.dataset.u && S.profiles[el.dataset.u]) go('player', el.dataset.u); },
+  back: () => { const p = S.prevRoute; if (p && p.view !== 'player') go(p.view, p.id); else go('friends'); },
+  'pg-refresh': el => loadPlayerGames(el.dataset.u, true),
+  'pg-pgn': el => { let g = null; for (const k in (S.pgames || {})) { const x = (S.pgames[k].list || []).find(y => y.id === el.dataset.id); if (x) g = x; } if (g) copyText(buildPGN(exportFromOnline(g)), 'PGN copied.', 'PGN'); },
+  'chat-open': el => { S.chatPick = false; S.chatId = el.dataset.id; S.chatWith = null; mountedKey = null; go('chat'); },
+  'chat-close': () => { S.chatId = null; subChat(null); mountedKey = null; render(); },
+  'chat-new': () => { S.chatPick = true; S.chatQ = ''; mountedKey = null; go('chat'); },
+  'chat-pick-close': () => { S.chatPick = false; mountedKey = null; render(); },
+  'chat-with': el => { const u = el.dataset.u; if (!u || u === S.uid) return; S.chatPick = false; S.chatId = chatIdFor(u); S.chatWith = u; mountedKey = null; go('chat'); },
+  'emoji-toggle': el => { S.emojiOpen = S.emojiOpen === el.dataset.cp ? null : el.dataset.cp; render(); },
+  emoji: el => { const cp = el.dataset.cp; S.drafts[cp] = (S.drafts[cp] || '') + el.dataset.e; const i = $('#tx-' + cp); if (i) { i.value = S.drafts[cp]; i.focus(); } },
+  send: el => doSend(el.dataset.cp),
+  quick: el => { const g = S.game; if (g) sendChat('g-' + g.id, [g.white, g.black], { t: el.dataset.q }); },
+  'img-open': el => { const d = S.imgCache[el.dataset.id]; if (d) { S.modal = { type: 'img', src: d }; renderModal(); } },
   'hist-filter': el => { S.histFilter = el.dataset.f; render(); },
   'hist-view': el => { const k = el.dataset.k; if (k.startsWith('g-')) go('game', k.slice(2)); else { const h = localHistory().find(x => x.id === k.slice(2)); if (h) openLocalGame(h); } },
   'hist-pgn': el => { const k = el.dataset.k; let x = null; if (k.startsWith('g-')) { const g = S.myGames.find(y => y.id === k.slice(2)); if (g) x = exportFromOnline(g); } else { const h = localHistory().find(y => y.id === k.slice(2)); if (h) x = exportFromLocal(h); } if (x) copyText(buildPGN(x), 'PGN copied.', 'PGN'); },
