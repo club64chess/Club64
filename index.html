@@ -196,6 +196,7 @@ table.std tr.me td{background:var(--accent-soft)}
 
 /* modal + toast */
 .modal{position:fixed;inset:0;z-index:50;background:rgba(8,12,18,.5);display:grid;place-items:center;padding:16px}
+.dzone{border:1px solid var(--line, rgba(0,0,0,.12));border-radius:10px;padding:10px 12px}.dzone summary{cursor:pointer;color:var(--bad);font-weight:700}.dzone[open] summary{margin-bottom:10px}
 .modal-in{background:var(--surface);border-radius:14px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:min(92vw,520px);box-shadow:var(--shadow)}
 @media (min-width:721px){.toast{bottom:24px}}
@@ -2353,10 +2354,28 @@ const AR11 = {
   'Thanks 🙏': 'شكراً 🙏', 'Wow 😮': 'واو 😮', 'Well played 🤝': 'لعبت حلو 🤝', 'Good game 🤝': 'ماتش حلو 🤝', 'Rematch? 🔁': 'نعيد؟ 🔁',
   "Couldn't send the message. Check your internet.": 'الرسالة ماتبعتتش. شوف النت عندك.', "Couldn't send the photo. Try a smaller picture.": 'الصورة ماتبعتتش. جرّب صورة أصغر.',
 };
+Object.assign(AR11, {
+  'I forgot my password': 'نسيت الباسورد', 'Send reset link': 'ابعتلي لينك', 'Your username': 'اسمك في Club 64',
+  "Type your username. We'll email a link to your recovery email so you can choose a new password.": 'اكتب اسمك، وهنبعتلك لينك على إيميلك تختار منه باسورد جديد.',
+  'No player with that username.': 'مفيش لعيب بالاسم ده.', "This account has no recovery email, so we can't send a link. Ask Islam (the club owner) to reset your account.": 'الحساب ده مفيهوش إيميل، فمش هنعرف نبعت لينك. كلّم إسلام (صاحب النادي) يظبطهولك.',
+  'Recovery email': 'إيميل الطوارئ', 'Add your email so "I forgot my password" can send you a reset link.': 'ضيف إيميلك عشان لو نسيت الباسورد نبعتلك لينك.',
+  'Current password': 'الباسورد الحالي', 'Save recovery email': 'احفظ الإيميل', 'Use your real email.': 'اكتب إيميلك الحقيقي.', "That email doesn't look right.": 'الإيميل ده شكله غلط.',
+  'Another account already uses that email.': 'فيه حساب تاني واخد الإيميل ده.', 'Current password is wrong.': 'الباسورد الحالي غلط.', 'Password is wrong.': 'الباسورد غلط.',
+  'Delete my account': 'امسح حسابي', 'Delete my account forever': 'امسح حسابي خالص', 'Deleting…': 'بيتمسح…', 'Type your username to confirm': 'اكتب اسمك عشان تأكد', 'Your password': 'الباسورد بتاعك',
+  "This removes your account, your username and your friends list for good. Games you already played stay in other players' history.": 'ده هيمسح حسابك واسمك وقايمة صحابك نهائي. الماتشات اللي لعبتها هتفضل في تاريخ اللعيبة التانيين.',
+  'Type your username exactly to confirm.': 'اكتب اسمك بالظبط عشان تأكد.', 'Your account was deleted. Bye for now 👋': 'حسابك اتمسح. سلام دلوقتي 👋',
+  "Couldn't delete the account. Check your internet and try again.": 'معرفناش نمسح الحساب. شوف النت وجرّب تاني.', "Couldn't send the link. Try again in a minute.": 'اللينك ماتبعتش. جرّب كمان دقيقة.',
+  'Too many tries. Wait a few minutes and try again.': 'جرّبت كتير. استنى كام دقيقة وجرّب تاني.', 'Too many tries. Wait a few minutes.': 'جرّبت كتير. استنى كام دقيقة.',
+  "In this offline copy, whoever owns this device can reset your password from the account menu (tap the name at the top after logging in).": 'في النسخة الأوفلاين، صاحب الجهاز يقدر يغيّرلك الباسورد من قايمة الحساب.',
+});
 for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
 const AR_CAT = { Bullet: 'بوليت', Blitz: 'بليتز', Rapid: 'رابيد', Classical: 'كلاسيك' };
 const AR_TAIL = s => s.replace(' · one device', ' · على جهاز واحد').replace(' · vs bot', ' · ضد بوت').replace(' · rated', ' · بتقييم');
 const AR_RX = [
+  [/^Sent! Check (\S+) \(look in Spam too\)\..*$/, (m, a) => `اتبعت! افتح ${a} (بص في الـ Spam كمان)، افتح اللينك واختار باسورد جديد، وبعدين ادخل هنا باسمك والباسورد الجديد.`],
+  [/^Almost done! We sent a link to (\S+)\..*$/, (m, a) => `قربنا! بعتنا لينك على ${a}. افتحه (بص في الـ Spam كمان)، وبعدين اطلع وادخل تاني.`],
+  [/^✓ (\S+) is confirmed\..*$/, (m, a) => `✓ ${a} متأكد. لو نسيت الباسورد اللينك هيروح عليه.`],
+  [/^Waiting: open the link we emailed to (\S+) .*$/, (m, a) => `مستنيينك: افتح اللينك اللي بعتناه على ${a} (بص في الـ Spam كمان)، وبعدين اطلع وادخل تاني.`],
   [/^Last seen (.+)$/, (m, a) => 'آخر ظهور ' + a.replace('just now', 'من شوية').replace(/^(\d+) min ago$/, 'من $1 دقيقة').replace(/^(\d+) h ago$/, 'من $1 ساعة').replace(/^(\d+) d ago$/, 'من $1 يوم')],
   [/^(\d+) online$/, (m, a) => `${a} أونلاين`],
   [/^💬 (.+?): (.+)$/, (m, a, b) => `💬 ${a}: ${AR[b] || b}`],
@@ -3378,7 +3397,10 @@ let authFails = 0, authLockUntil = 0;
 async function doLogin(name, pw) {
   if (S.fb) {
     const lower = name.trim().toLowerCase(); if (!lower || !pw) return 'Enter your username and password.';
-    try { const c = await S.auth.signInWithEmailAndPassword(FB_EMAIL(lower), pw); const p = await S.db.doc('profiles/' + c.user.uid).get(); if (!p.exists) { await S.auth.signOut(); return 'This account was never finished. Sign up again with the club code.'; } signIn(c.user.uid); toast('Welcome back, ' + p.data().username + '.'); return null; }
+    try { let alt = null; if (lower.includes('@')) alt = lower; else { try { const u = await S.db.doc('usernames/' + lower).get(); if (u.exists && u.data().e) alt = u.data().e; } catch (e) {} }
+      const tries = lower.includes('@') ? [lower] : alt ? [alt, FB_EMAIL(lower)] : [FB_EMAIL(lower)]; let c = null, last = null;
+      for (const em of tries) { try { c = await S.auth.signInWithEmailAndPassword(em, pw); break; } catch (e) { last = e; const k = String(e && e.code || ''); if (k.includes('too-many') || k.includes('network')) break; } }
+      if (!c) throw last; const p = await S.db.doc('profiles/' + c.user.uid).get(); if (!p.exists) { await S.auth.signOut(); return 'This account was never finished. Sign up again with the club code.'; } signIn(c.user.uid); toast('Welcome back, ' + p.data().username + '.'); return null; }
     catch (e) { const c = e && e.code || ''; if (c.includes('too-many-requests')) return 'Too many tries. Wait a minute and try again.'; if (c.includes('network')) return "Can't connect. Check your internet."; return 'Wrong username or password.'; }
   }
   if (now() < authLockUntil) return `Too many tries. Wait ${Math.ceil((authLockUntil - now()) / 1000)} seconds.`;
@@ -3429,6 +3451,50 @@ async function doSignup(raw, pw, pw2, code) {
   signIn(uid); toast('Welcome to Club 64, ' + raw + '.'); return null;
 }
 async function setPassword(uid, pw) { const h = await hashPw(pw); await S.db.doc('auth/' + uid).set({ ...h, at: now() }); }
+function maskEmail(e) { const [a, d] = String(e).split('@'); return (a.length <= 2 ? a[0] + '*' : a.slice(0, 2) + '***' + a.slice(-1)) + '@' + d; }
+async function mountAccountExtras() {
+  const re = $('#re-form');
+  if (re && S.fb) {
+    const st = $('#re-status'); const lower = (S.me.lower || S.me.username || '').toLowerCase();
+    (async () => { try { const u = S.auth.currentUser; try { await u.reload(); } catch (e) {} const d = await S.db.doc('usernames/' + lower).get(); const e = d.exists && d.data().e;
+      if (!e || !st.isConnected) return; $('#re-email').value = e;
+      if ((u.email || '').toLowerCase() === e.toLowerCase()) { st.style.color = 'var(--good)'; st.textContent = '✓ ' + e + ' is confirmed. "I forgot my password" will send the link there.'; }
+      else { st.style.color = 'var(--warn, #b45309)'; st.textContent = 'Waiting: open the link we emailed to ' + e + ' (look in Spam too). After that, log out and log in again.'; } } catch (e) {} })();
+    re.addEventListener('submit', async ev => {
+      ev.preventDefault(); const out = $('#re-err'); out.style.color = 'var(--bad)'; out.textContent = ''; const btn = re.querySelector('button[type=submit]');
+      const email = $('#re-email').value.trim().toLowerCase(), pw = $('#re-pw').value;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { out.textContent = "That email doesn't look right."; return; }
+      if (email.endsWith('@players.club64.app')) { out.textContent = 'Use your real email.'; return; }
+      btn.disabled = true;
+      try { const u = S.auth.currentUser; await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, pw));
+        if ((u.email || '').toLowerCase() !== email) await u.verifyBeforeUpdateEmail(email);
+        await S.db.doc('usernames/' + lower).update({ e: email });
+        $('#re-pw').value = ''; out.style.color = 'var(--good)'; out.textContent = 'Almost done! We sent a link to ' + email + '. Open it (look in Spam too), then log out and log in again.';
+      } catch (e2) { const k = String(e2 && e2.code || ''); out.textContent = k.includes('credential') || k.includes('wrong-password') ? 'Current password is wrong.' : k.includes('email-already-in-use') ? 'Another account already uses that email.' : k.includes('invalid-email') ? "That email doesn't look right." : k.includes('too-many') ? 'Too many tries. Wait a few minutes.' : k === 'invalid_argument' ? 'Firebase refused it. The new Firestore rules (version 12) need to be published.' : "Couldn't save the email. Check your internet and try again."; }
+      btn.disabled = false;
+    });
+  }
+  const dl = $('#dl-form');
+  if (dl) dl.addEventListener('submit', async ev => {
+    ev.preventDefault(); const out = $('#dl-err'); out.textContent = ''; const btn = dl.querySelector('button[type=submit]');
+    const typed = $('#dl-user').value.trim().toLowerCase(), pw = $('#dl-pw').value; const lower = (S.me.lower || S.me.username || '').toLowerCase();
+    if (typed !== lower) { out.textContent = 'Type your username exactly to confirm.'; return; }
+    btn.disabled = true; btn.textContent = 'Deleting…';
+    try {
+      if (S.fb) { const u = S.auth.currentUser; await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, pw)); }
+      else { const a = await S.db.doc('auth/' + S.uid).get(); if (a.exists) { const h = await hashPw(pw, a.data().salt, a.data().iter); if (h.hash !== a.data().hash) throw { code: 'wrong-password' }; } }
+      for (const f of S.friends) { try { await S.db.doc('friends/' + f.id).delete(); } catch (e) {} }
+      try { await S.db.doc('usernames/' + lower).delete(); } catch (e) {}
+      if (!S.fb) { try { await S.db.doc('auth/' + S.uid).delete(); } catch (e) {} }
+      await S.db.doc('profiles/' + S.uid).delete();
+      if (S.fb) await S.auth.currentUser.delete();
+      S.modal = null; renderModal(); try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+      $('#main').innerHTML = '<div class="splash"><h2>Your account was deleted. Bye for now 👋</h2></div>';
+      setTimeout(() => signOut(), 1800);
+    } catch (e2) { const k = String(e2 && e2.code || ''); btn.disabled = false; btn.textContent = 'Delete my account forever';
+      out.textContent = k.includes('credential') || k.includes('wrong-password') ? 'Password is wrong.' : k === 'invalid_argument' ? 'Firebase refused it. The new Firestore rules (version 12) need to be published.' : k.includes('too-many') ? 'Too many tries. Wait a few minutes.' : "Couldn't delete the account. Check your internet and try again."; }
+  });
+}
 const authHero = (t, sub) => `<div class="hero card"><div class="stack"><span class="label">Club 64</span><h1>${t}</h1><p class="muted">${sub}</p></div>
     <div class="hero-board">${Array.from({ length: 16 }, (_, i) => `<i class="${(Math.floor(i / 4) + i) % 2 ? 'd' : ''}">${i === 5 ? '<span class="pc wn"></span>' : i === 10 ? '<span class="pc bq"></span>' : ''}</i>`).join('')}</div></div>`;
 VIEWS.auth = {
@@ -3451,6 +3517,7 @@ VIEWS.auth = {
         ${login ? '' : `<div class="field"><label class="label" for="au-pw2">Repeat password</label><input id="au-pw2" type="password" autocomplete="new-password" required></div><p class="small muted" style="margin-top:-8px">At least 6 characters.${S.fb ? '' : " Don't reuse a password from your email or bank."}</p>${S.fb ? `<div class="field"><label class="label" for="au-code">Club code</label><input id="au-code" type="text" autocapitalize="none" spellcheck="false" placeholder="The code Islam gave you" required></div>` : ''}`}
         <p class="small" id="au-err" style="color:var(--bad)" role="alert"></p>
         <button class="btn primary lg" type="submit">${login ? 'Log in' : 'Create account'}</button>
+        ${login ? `<p class="small" style="text-align:center;margin:0"><a href="#" data-act="forgot">I forgot my password</a></p>` : ''}
         <p class="small muted" style="text-align:center">${login ? `New here? <a href="#" data-act="auth-tab" data-m="signup">Create an account</a>` : `Already have an account? <a href="#" data-act="auth-tab" data-m="login">Log in</a>`}</p>
       </form></div>`;
   },
@@ -4309,7 +4376,17 @@ function renderModal() {
       ${m.owner ? `<form id="rs-form" class="stack"><div class="label">Reset a member's password</div><p class="small muted" style="margin:0">Only you see this, as the owner. Use it when a friend forgets their password.</p>
         <input id="rs-user" type="text" placeholder="Their username" autocapitalize="none" required><input id="rs-pw" type="text" placeholder="Temporary password (6+ characters)" required>
         <p class="small" id="rs-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Reset password</button></form>` : ''}
-      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div><p class="small muted" style="margin:0">Club 64 · version 11</p></div></div>`;
+      ${S.fb ? `<form id="re-form" class="stack"><div class="label">Recovery email</div><p class="small muted" id="re-status" style="margin:0">Add your email so "I forgot my password" can send you a reset link.</p>
+        <input id="re-email" type="email" placeholder="you@gmail.com" autocomplete="email" autocapitalize="none" required>
+        <input id="re-pw" type="password" placeholder="Current password" autocomplete="current-password" required>
+        <p class="small" id="re-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Save recovery email</button></form>` : ''}
+      <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div>
+      ${S.fb || S.mode === 'local' ? `<details class="dzone"><summary>Delete my account</summary><form id="dl-form" class="stack"><p class="small muted" style="margin:0">This removes your account, your username and your friends list for good. Games you already played stay in other players' history.</p>
+        <input id="dl-user" type="text" placeholder="Type your username to confirm" autocapitalize="none" spellcheck="false" required>
+        <input id="dl-pw" type="password" placeholder="Your password" autocomplete="current-password" required>
+        <p class="small" id="dl-err" role="alert" style="margin:0;color:var(--bad)"></p><button class="btn danger" type="submit">Delete my account forever</button></form></details>` : ''}
+      <p class="small muted" style="margin:0">Club 64 · version 12</p></div></div>`;
+    mountAccountExtras();
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
       const cur = $('#pw-cur').value, nw = $('#pw-new').value; if (nw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
@@ -4323,6 +4400,25 @@ function renderModal() {
       const lower = $('#rs-user').value.trim().toLowerCase(), pw = $('#rs-pw').value; if (pw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
       try { const u = await S.db.doc('usernames/' + lower).get(); if (!u.exists) { out.textContent = 'No player with that username.'; return; }
         await setPassword(u.data().uid, pw); out.style.color = 'var(--good)'; out.textContent = `Done. Tell ${$('#rs-user').value.trim()} to log in with the temporary password and change it.`; } catch (e2) { out.textContent = "Couldn't reset the password."; }
+    });
+    return;
+  }
+  if (m.type === 'forgot') {
+    root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="I forgot my password"><h2>I forgot my password</h2>
+      ${S.fb ? `<p class="muted" style="margin:0">Type your username. We'll email a link to your recovery email so you can choose a new password.</p>
+      <form id="fg-form" class="stack"><input id="fg-user" type="text" placeholder="Your username" autocapitalize="none" spellcheck="false" autocomplete="username" required value="${esc(m.name || '')}">
+      <p class="small" id="fg-err" role="alert" style="margin:0"></p><div class="row"><button class="btn primary" type="submit">Send reset link</button><button class="btn" type="button" data-act="modal-close">Close</button></div></form>`
+      : `<p class="muted" style="margin:0">In this offline copy, whoever owns this device can reset your password from the account menu (tap the name at the top after logging in).</p><div class="row"><button class="btn" data-act="modal-close">Close</button></div>`}</div></div>`;
+    const f = $('#fg-form'); if (f) f.addEventListener('submit', async e => {
+      e.preventDefault(); const out = $('#fg-err'); out.style.color = 'var(--bad)'; out.textContent = ''; const btn = f.querySelector('button[type=submit]'); btn.disabled = true;
+      const lower = $('#fg-user').value.trim().toLowerCase();
+      try {
+        const u = await S.db.doc('usernames/' + lower).get();
+        if (!u.exists) out.textContent = 'No player with that username.';
+        else if (!u.data().e) out.textContent = "This account has no recovery email, so we can't send a link. Ask Islam (the club owner) to reset your account.";
+        else { await S.auth.sendPasswordResetEmail(u.data().e); out.style.color = 'var(--good)'; out.textContent = 'Sent! Check ' + maskEmail(u.data().e) + ' (look in Spam too). Open the link, choose a new password, then log in here with your username and the new password.'; }
+      } catch (e2) { const k = String(e2 && e2.code || ''); out.textContent = k.includes('too-many') ? 'Too many tries. Wait a few minutes and try again.' : k.includes('network') ? "Can't connect. Check your internet." : "Couldn't send the link. Try again in a minute."; }
+      btn.disabled = false;
     });
     return;
   }
@@ -4357,6 +4453,7 @@ const ACTIONS = {
   logout: () => { S.modal = null; renderModal(); signOut(); },
   'auth-tab': el => { S.authMode = el.dataset.m; mountedKey = null; renderNow(); },
   'modal-close': () => { S.modal = null; renderModal(); },
+  forgot: () => { S.modal = { type: 'forgot', name: ($('#au-name') && $('#au-name').value.trim()) || '' }; renderModal(); },
   'modal-bg': (el, e) => { if (e.target === el) { S.modal = null; renderModal(); } },
   'confirm-yes': () => { const m = S.modal; S.modal = null; renderModal(); m.fn(); },
   'ch-accept': async el => {
