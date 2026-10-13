@@ -197,6 +197,7 @@ table.std tr.me td{background:var(--accent-soft)}
 /* modal + toast */
 .modal{position:fixed;inset:0;z-index:50;background:rgba(8,12,18,.5);display:grid;place-items:center;padding:16px}
 .chead .btn.sm{flex:none}@media (max-width:700px){.hide-sm{display:none}}
+.nsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:12px}.nsteps li{line-height:1.45}.ncheck{display:flex;gap:10px;align-items:center;cursor:pointer}.ncheck input{width:20px;height:20px;accent-color:var(--accent)}
 .dzone{border:1px solid var(--line, rgba(0,0,0,.12));border-radius:10px;padding:10px 12px}.dzone summary{cursor:pointer;color:var(--bad);font-weight:700}.dzone[open] summary{margin-bottom:10px}
 .modal-in{background:var(--surface);border-radius:14px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:min(92vw,520px);box-shadow:var(--shadow)}
@@ -2373,10 +2374,22 @@ Object.assign(AR11, {
   'Delete chat': 'امسح الشات', 'Delete this chat?': 'تمسح الشات ده؟', 'Chat deleted.': 'الشات اتمسح.', 'Block': 'بلوك', '🚫 Block': '🚫 بلوك', 'Unblock': 'شيل البلوك', 'Blocked': 'متبلّكين',
   "Can't message or challenge you": 'مش هيقدر يكلمك أو يتحداك', "You can't message this player.": 'مش هتقدر تكلّم اللعيب ده.', "You can't challenge this player.": 'مش هتقدر تتحدى اللعيب ده.', "You can't add this player.": 'مش هتقدر تضيف اللعيب ده.',
 });
+Object.assign(AR11, {
+  '🔔 Phone notifications': '🔔 إشعارات الموبايل', '🔔 Phone notifications · On': '🔔 إشعارات الموبايل · شغّالة', 'Turn on': 'شغّلها',
+  'Get a notification on your phone when someone challenges you, invites you to a tournament or messages you on Chat 64, and 5 minutes before a tournament you joined starts. It works even when Club 64 is closed.': 'هيجيلك إشعار على الموبايل لما حد يتحداك أو يعزمك على بطولة أو يبعتلك رسالة على شات 64، وقبل البطولة اللي داخلها بـ ٥ دقايق. وده شغال حتى لو Club 64 مقفول.',
+  'Install the free ntfy app.': 'نزّل أبلكيشن ntfy المجاني.', 'App Store (iPhone)': 'آب ستور (آيفون)', 'Google Play (Android)': 'جوجل بلاي (أندرويد)',
+  'Subscribe to your private topic.': 'اشترك في التوبيك الخاص بيك.', 'Android: open it in ntfy directly': 'أندرويد: افتحه في ntfy على طول',
+  'Test it.': 'جرّبه.', 'Send a test notification': 'ابعت إشعار تجربة', 'Challenges and tournament invites': 'التحديات وعزومات البطولات', '5 minutes before my tournaments start': 'قبل بطولاتي ما تبدأ بـ ٥ دقايق', "Chat 64 messages (when I'm not on Club 64)": 'رسايل شات 64 (لما أكون مش فاتح Club 64)',
+  'Keep your topic name private: anyone who has it can see your Club 64 notifications.': 'خلّي اسم التوبيك سر: أي حد معاه يقدر يشوف إشعاراتك.', 'Turn off notifications': 'اقفل الإشعارات',
+  'Notifications are on. Now follow the 3 steps.': 'الإشعارات اشتغلت. كمّل الـ ٣ خطوات.', 'Phone notifications are off.': 'إشعارات الموبايل اتقفلت.',
+  'Topic copied. Paste it in ntfy.': 'اتنسخ. الزقه في ntfy.', 'Sent! It should arrive on your phone in a few seconds.': 'اتبعت! المفروض يوصل الموبايل في ثواني.',
+  'Your topic': 'التوبيك بتاعك',
+});
 for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
 const AR_CAT = { Bullet: 'بوليت', Blitz: 'بليتز', Rapid: 'رابيد', Classical: 'كلاسيك' };
 const AR_TAIL = s => s.replace(' · one device', ' · على جهاز واحد').replace(' · vs bot', ' · ضد بوت').replace(' · rated', ' · بتقييم');
 const AR_RX = [
+  [/^In ntfy, tap \+, paste this name, then tap Subscribe\. Allow notifications if your phone asks\.$/, () => 'في ntfy دوس على +، الزق الاسم ده، وبعدين دوس Subscribe. ولو الموبايل سألك وافق على الإشعارات.'],
   [/^You blocked (.+?)\. They can't message or challenge you\.$/, (m, a) => `عملت بلوك لـ ${a}. مش هيقدر يكلمك أو يتحداك.`],
   [/^You unblocked (.+?)\.$/, (m, a) => `شيلت البلوك عن ${a}.`],
   [/^You blocked (.+?)\. Unblock them to send messages\.$/, (m, a) => `إنت عامل بلوك لـ ${a}. شيل البلوك عشان تبعتله.`],
@@ -2784,7 +2797,7 @@ function startSubs() {
     setTimeout(() => heartbeat(true), 500);
   }
   db.collection('bots').limit(200).onSnapshot(s => { S.bots = s.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => a.createdAt - b.createdAt); render(); }, subErr);
-  db.collection('tournaments').orderBy('startAt', 'desc').limit(100).onSnapshot(s => { S.tournaments = s.docs.map(d => ({ ...d.data(), id: d.id })); render(); }, subErr);
+  db.collection('tournaments').orderBy('startAt', 'desc').limit(100).onSnapshot(s => { S.tournaments = s.docs.map(d => ({ ...d.data(), id: d.id })); render(); scheduleReminderSync(); }, subErr);
 }
 
 /* ---------- names & ratings ---------- */
@@ -4223,6 +4236,7 @@ async function sendChat(id, members, msg) {
   try {
     try { await dbPush('chats/' + id, 'msgs', m, { lastAt: m.at, lastFrom: S.uid, lastText: preview }); }
     catch (e) { await ensureChat(id, members); await dbPush('chats/' + id, 'msgs', m, { lastAt: m.at, lastFrom: S.uid, lastText: preview }); }
+    if (id.startsWith('dm-') && members) { const o = members.find(x => x !== S.uid); if (o && presenceOf(o) === 'off') notifyUser(o, 'msg', m.img ? '📷 sent you a photo' : String(m.t || '').slice(0, 300), '💬 ' + pname(S.uid) + ' · Chat 64', 'chat'); }
   } catch (e) { console.warn(e); toast("Couldn't send the message. Check your internet."); }
 }
 async function imgToDataURL(file, max = 1024, q = .72) {
@@ -4413,12 +4427,13 @@ function renderModal() {
         <input id="re-email" type="email" placeholder="you@gmail.com" autocomplete="email" autocapitalize="none" required>
         <input id="re-pw" type="password" placeholder="Current password" autocomplete="current-password" required>
         <p class="small" id="re-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Save recovery email</button></form>` : ''}
+      ${S.mode === 'online' ? `<button class="btn" data-act="notif-open">🔔 Phone notifications${S.me.ntfy ? ' · On' : ''}</button>` : ''}
       <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div>
       ${S.fb || S.mode === 'local' ? `<details class="dzone"><summary>Delete my account</summary><form id="dl-form" class="stack"><p class="small muted" style="margin:0">This removes your account, your username and your friends list for good. Games you already played stay in other players' history.</p>
         <input id="dl-user" type="text" placeholder="Type your username to confirm" autocapitalize="none" spellcheck="false" required>
         <input id="dl-pw" type="password" placeholder="Your password" autocomplete="current-password" required>
         <p class="small" id="dl-err" role="alert" style="margin:0;color:var(--bad)"></p><button class="btn danger" type="submit">Delete my account forever</button></form></details>` : ''}
-      <p class="small muted" style="margin:0">Club 64 · version 13</p></div></div>`;
+      <p class="small muted" style="margin:0">Club 64 · version 15</p></div></div>`;
     mountAccountExtras();
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
@@ -4434,6 +4449,26 @@ function renderModal() {
       try { const u = await S.db.doc('usernames/' + lower).get(); if (!u.exists) { out.textContent = 'No player with that username.'; return; }
         await setPassword(u.data().uid, pw); out.style.color = 'var(--good)'; out.textContent = `Done. Tell ${$('#rs-user').value.trim()} to log in with the temporary password and change it.`; } catch (e2) { out.textContent = "Couldn't reset the password."; }
     });
+    return;
+  }
+  if (m.type === 'notif') {
+    const n = S.me && S.me.ntfy;
+    root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="Phone notifications"><h2>🔔 Phone notifications</h2>
+      <p class="muted" style="margin:0">Get a notification on your phone when someone challenges you, invites you to a tournament or messages you on Chat 64, and 5 minutes before a tournament you joined starts. It works even when Club 64 is closed.</p>
+      ${!n ? `<button class="btn primary" data-act="notif-on">Turn on</button>` : `
+      <ol class="nsteps">
+        <li><b>Install the free ntfy app.</b><div class="row" style="margin-top:6px"><a class="btn sm" href="https://apps.apple.com/us/app/ntfy/id1625396347" target="_blank" rel="noopener">App Store (iPhone)</a><a class="btn sm" href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Google Play (Android)</a></div></li>
+        <li><b>Subscribe to your private topic.</b> <span>In ntfy, tap +, paste this name, then tap Subscribe. Allow notifications if your phone asks.</span>
+          <div class="linkbox" style="margin-top:6px"><input type="text" readonly value="${esc(n.topic)}" aria-label="Your topic" data-notr><button class="btn" data-act="notif-copy">Copy</button></div>
+          <a class="small" href="ntfy://ntfy.sh/${esc(n.topic)}?display=Club+64">Android: open it in ntfy directly</a></li>
+        <li><b>Test it.</b> <button class="btn sm" data-act="notif-test">Send a test notification</button></li>
+      </ol>
+      <div class="stack" style="gap:8px"><label class="ncheck"><input type="checkbox" data-act="notif-kind" data-k="ch" ${n.ch !== false ? 'checked' : ''}> Challenges and tournament invites</label>
+      <label class="ncheck"><input type="checkbox" data-act="notif-kind" data-k="msg" ${n.msg !== false ? 'checked' : ''}> Chat 64 messages (when I'm not on Club 64)</label>
+      <label class="ncheck"><input type="checkbox" data-act="notif-kind" data-k="tour" ${n.tour !== false ? 'checked' : ''}> 5 minutes before my tournaments start</label></div>
+      <p class="small muted" style="margin:0">Keep your topic name private: anyone who has it can see your Club 64 notifications.</p>
+      <button class="btn danger" data-act="notif-off">Turn off notifications</button>`}
+      <button class="btn" data-act="modal-close">Close</button></div></div>`;
     return;
   }
   if (m.type === 'forgot') {
@@ -4468,7 +4503,50 @@ function confirmBox(title, body, yes, fn, danger) { S.modal = { type: 'confirm',
 const pairId = (a, b) => [a, b].sort().join('~');
 async function sendChallenge(to, tc) {
   if (blocksMe(to) || isBlocked(to)) { toast("You can't challenge this player."); return; }
-  try { await w(S.db.collection('invites').add({ kind: 'challenge', from: S.uid, to, base: tc[0], inc: tc[1], status: 'pending', createdAt: now() })); toast(`Challenge sent to ${pname(to)}. The game opens when they accept.`); } catch (e) {}
+  try { await w(S.db.collection('invites').add({ kind: 'challenge', from: S.uid, to, base: tc[0], inc: tc[1], status: 'pending', createdAt: now() })); toast(`Challenge sent to ${pname(to)}. The game opens when they accept.`); notifyUser(to, 'ch', `${pname(S.uid)} challenged you to a ${fmtTC(tc[0], tc[1])} game. Tap to open Club 64.`, '♟️ New challenge!', 'play'); } catch (e) {}
+}
+
+/* ---------- phone notifications via the free ntfy app ---------- */
+const NTFY = 'https://ntfy.sh/';
+const ntfyOf = uid => { const p = uid === S.uid ? S.me : S.profiles[uid]; return p && p.ntfy && p.ntfy.topic ? p.ntfy : null; };
+const siteURL = h => location.origin + location.pathname + (h ? '#' + h : '');
+function ntfyPost(topic, msg, o = {}) {
+  const q = new URLSearchParams(); if (o.title) q.set('title', o.title); if (o.click) q.set('click', o.click); if (o.tags) q.set('tags', o.tags); if (o.at) q.set('delay', String(Math.floor(o.at / 1000)));
+  return fetch(NTFY + encodeURIComponent(topic) + (o.seq ? '/' + o.seq : '') + '?' + q.toString(), { method: 'POST', body: msg, mode: 'no-cors' }).catch(e => console.warn('ntfy', e));
+}
+function ntfyCancel(topic, seq) { return fetch(NTFY + encodeURIComponent(topic) + '/' + seq + '/delete', { mode: 'no-cors' }).catch(() => {}); }
+function notifyUser(uid, kind, msg, title, hash) {
+  if (S.mode !== 'online' || !uid || uid === S.uid) return; const n = ntfyOf(uid); if (!n || n[kind] === false) return;
+  ntfyPost(n.topic, msg, { title, click: siteURL(hash), tags: 'chess_pawn' });
+}
+let remindTimer = null;
+function scheduleReminderSync() { clearTimeout(remindTimer); remindTimer = setTimeout(syncTourReminders, 2500); }
+async function syncTourReminders() {
+  if (S.mode !== 'online' || !S.uid) return;
+  const t = now(), LEAD = 5 * 60000, MAX = 3 * 86400000 - 120000;
+  for (const T of S.tournaments || []) {
+    const rem = T.remind || {}, players = T.players || {}, want = {};
+    const live = T.status === 'scheduled' && T.startAt - LEAD - t > 20000 && T.startAt - LEAD - t < MAX;
+    if (live) for (const [u, pl] of Object.entries(players)) { const n = ntfyOf(u); if (pl && !pl.withdrawn && n && n.tour !== false) want[u] = T.startAt + '|' + n.topic; }
+    const changes = []; for (const u of new Set([...Object.keys(want), ...Object.keys(rem)])) { const cur = rem[u] || null, nw = want[u] || null; if (cur === nw) continue; if (!nw && cur && +cur.split('|')[0] <= t) continue; changes.push(u); }
+    if (!changes.length) continue;
+    try {
+      const lock = await S.db.doc('locks/remind-' + T.id).acquire({ holder: TAB, ttlMs: 15000 }); if (!lock.acquired) continue;
+      const fresh = await S.db.doc('tournaments/' + T.id).get(); if (!fresh.exists) continue; const R = fresh.data().remind || {}; const upd = {};
+      for (const u of changes) {
+        const cur = R[u] || null, nw = want[u] || null; if (cur === nw) continue;
+        if (cur) { const [, topic] = cur.split('|'); await ntfyCancel(topic, 'c64t' + T.id); }
+        if (nw) { const [, topic] = nw.split('|'); await ntfyPost(topic, `${T.name} starts in 5 minutes. Get ready! ♟️`, { title: '⏰ Tournament starting soon', click: siteURL('t-' + T.id), tags: 'alarm_clock', at: T.startAt - LEAD, seq: 'c64t' + T.id }); }
+        upd[u] = nw;
+      }
+      if (Object.keys(upd).length) await S.db.doc('tournaments/' + T.id).update({ remind: upd });
+    } catch (e) { console.warn('remind', e); }
+  }
+}
+async function setNotif(patch) {
+  const cur = (S.me && S.me.ntfy) || {}; const next = patch === null ? null : { ...cur, ...patch };
+  try { await S.db.doc('profiles/' + S.uid).update({ ntfy: next }); S.me = { ...S.me, ntfy: next }; if (S.profiles[S.uid]) S.profiles[S.uid] = { ...S.profiles[S.uid], ntfy: next }; scheduleReminderSync(); renderModal(); render(); return true; }
+  catch (e) { console.warn(e); toast("Couldn't save that. Check your internet and try again."); return false; }
 }
 const ACTIONS = {
   nav: el => { const v = el.dataset.v; if (v === 'create' && !S.draft) S.draft = newDraft(); go(v); },
@@ -4487,6 +4565,12 @@ const ACTIONS = {
   logout: () => { S.modal = null; renderModal(); signOut(); },
   'auth-tab': el => { S.authMode = el.dataset.m; mountedKey = null; renderNow(); },
   'modal-close': () => { S.modal = null; renderModal(); },
+  'notif-open': () => { S.modal = { type: 'notif' }; renderModal(); },
+  'notif-on': async () => { if (await setNotif({ topic: 'c64-' + rid(20).toLowerCase(), ch: true, msg: true, tour: true, at: now() })) toast('Notifications are on. Now follow the 3 steps.'); },
+  'notif-off': async () => { if (await setNotif(null)) toast('Phone notifications are off.'); },
+  'notif-copy': () => { const n = S.me && S.me.ntfy; if (n) copyText(n.topic, 'Topic copied. Paste it in ntfy.', 'Your topic'); },
+  'notif-test': () => { const n = S.me && S.me.ntfy; if (!n) return; ntfyPost(n.topic, 'It works! You will get Club 64 notifications here. ♟️', { title: '✅ Club 64 test', click: siteURL('play'), tags: 'white_check_mark' }); toast('Sent! It should arrive on your phone in a few seconds.'); },
+  'notif-kind': el => { setNotif({ [el.dataset.k]: el.checked }); },
   forgot: () => { S.modal = { type: 'forgot', name: ($('#au-name') && $('#au-name').value.trim()) || '' }; renderModal(); },
   'modal-bg': (el, e) => { if (e.target === el) { S.modal = null; renderModal(); } },
   'confirm-yes': () => { const m = S.modal; S.modal = null; renderModal(); m.fn(); },
@@ -4504,7 +4588,7 @@ const ACTIONS = {
   'share-sel': el => { const u = el.dataset.u; if (el.checked) S.shareSel.add(u); else S.shareSel.delete(u); render(); },
   'send-invites': async () => {
     const T = S.tour; const list = [...S.shareSel]; S.shareSel = new Set();
-    try { for (const u of list) await w(S.db.collection('invites').add({ kind: 'tournament', from: S.uid, to: u, tid: T.id, status: 'pending', createdAt: now() })); toast(`Sent ${list.length} invite${list.length === 1 ? '' : 's'}.`); } catch (e) {}
+    try { for (const u of list) { await w(S.db.collection('invites').add({ kind: 'tournament', from: S.uid, to: u, tid: T.id, status: 'pending', createdAt: now() })); notifyUser(u, 'ch', `${pname(S.uid)} invited you to the tournament "${T.name}". Tap to join.`, '🏆 Tournament invite', 't-' + T.id); } toast(`Sent ${list.length} invite${list.length === 1 ? '' : 's'}.`); } catch (e) {}
     render();
   },
   't-join': () => { const T = S.tour; w(S.db.doc('tournaments/' + T.id).update({ players: { [S.uid]: { joinedAt: now(), withdrawn: false, paused: false } } })).then(() => { toast("You're in. Keep this page open."); updatePresence(); }).catch(() => {}); },
