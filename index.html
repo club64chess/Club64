@@ -2375,14 +2375,14 @@ Object.assign(AR11, {
   "Can't message or challenge you": 'مش هيقدر يكلمك أو يتحداك', "You can't message this player.": 'مش هتقدر تكلّم اللعيب ده.', "You can't challenge this player.": 'مش هتقدر تتحدى اللعيب ده.', "You can't add this player.": 'مش هتقدر تضيف اللعيب ده.',
 });
 Object.assign(AR11, {
-  '🔔 Phone notifications': '🔔 إشعارات الموبايل', '🔔 Phone notifications · On': '🔔 إشعارات الموبايل · شغّالة', 'Turn on': 'شغّلها',
-  'Get a notification on your phone when someone challenges you, invites you to a tournament or messages you on Chat 64, and 5 minutes before a tournament you joined starts. It works even when Club 64 is closed.': 'هيجيلك إشعار على الموبايل لما حد يتحداك أو يعزمك على بطولة أو يبعتلك رسالة على شات 64، وقبل البطولة اللي داخلها بـ ٥ دقايق. وده شغال حتى لو Club 64 مقفول.',
+  '🔔 Notifications': '🔔 الإشعارات', '🔔 Notifications · On': '🔔 الإشعارات · شغّالة', 'Computer (ntfy.sh/app)': 'كمبيوتر (ntfy.sh/app)', "On a computer there's nothing to install: open ntfy.sh/app in your browser and allow notifications. You can use your phone and computer together.": 'على الكمبيوتر مش محتاج تنزّل حاجة: افتح ntfy.sh/app في البراوزر ووافق على الإشعارات. وتقدر تستخدم الموبايل والكمبيوتر مع بعض.', '🔔 Phone notifications · On': '🔔 إشعارات الموبايل · شغّالة', 'Turn on': 'شغّلها',
+  'Get a notification on your phone or computer when someone challenges you, invites you to a tournament or messages you on Chat 64, and 5 minutes before a tournament you joined starts. It works even when Club 64 is closed.': 'هيجيلك إشعار على الموبايل أو الكمبيوتر لما حد يتحداك أو يعزمك على بطولة أو يبعتلك رسالة على شات 64، وقبل البطولة اللي داخلها بـ ٥ دقايق. وده شغال حتى لو Club 64 مقفول.',
   'Install the free ntfy app.': 'نزّل أبلكيشن ntfy المجاني.', 'App Store (iPhone)': 'آب ستور (آيفون)', 'Google Play (Android)': 'جوجل بلاي (أندرويد)',
   'Subscribe to your private topic.': 'اشترك في التوبيك الخاص بيك.', 'Android: open it in ntfy directly': 'أندرويد: افتحه في ntfy على طول',
   'Test it.': 'جرّبه.', 'Send a test notification': 'ابعت إشعار تجربة', 'Challenges and tournament invites': 'التحديات وعزومات البطولات', '5 minutes before my tournaments start': 'قبل بطولاتي ما تبدأ بـ ٥ دقايق', "Chat 64 messages (when I'm not on Club 64)": 'رسايل شات 64 (لما أكون مش فاتح Club 64)',
   'Keep your topic name private: anyone who has it can see your Club 64 notifications.': 'خلّي اسم التوبيك سر: أي حد معاه يقدر يشوف إشعاراتك.', 'Turn off notifications': 'اقفل الإشعارات',
-  'Notifications are on. Now follow the 3 steps.': 'الإشعارات اشتغلت. كمّل الـ ٣ خطوات.', 'Phone notifications are off.': 'إشعارات الموبايل اتقفلت.',
-  'Topic copied. Paste it in ntfy.': 'اتنسخ. الزقه في ntfy.', 'Sent! It should arrive on your phone in a few seconds.': 'اتبعت! المفروض يوصل الموبايل في ثواني.',
+  'Notifications are on. Now follow the 3 steps.': 'الإشعارات اشتغلت. كمّل الـ ٣ خطوات.', 'Notifications are off.': 'إشعارات الموبايل اتقفلت.',
+  'Topic copied. Paste it in ntfy.': 'اتنسخ. الزقه في ntfy.', 'Sent! It should arrive in a few seconds.': 'اتبعت! المفروض يوصل في ثواني.',
   'Your topic': 'التوبيك بتاعك',
 });
 for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
@@ -4427,13 +4427,13 @@ function renderModal() {
         <input id="re-email" type="email" placeholder="you@gmail.com" autocomplete="email" autocapitalize="none" required>
         <input id="re-pw" type="password" placeholder="Current password" autocomplete="current-password" required>
         <p class="small" id="re-err" role="alert" style="margin:0"></p><button class="btn" type="submit">Save recovery email</button></form>` : ''}
-      ${S.mode === 'online' ? `<button class="btn" data-act="notif-open">🔔 Phone notifications${S.me.ntfy ? ' · On' : ''}</button>` : ''}
+      ${S.mode === 'online' ? `<button class="btn" data-act="notif-open">🔔 Notifications${S.me.ntfy ? ' · On' : ''}</button>` : ''}
       <div class="row"><button class="btn danger" data-act="logout">Log out</button><button class="btn" data-act="modal-close">Close</button></div>
       ${S.fb || S.mode === 'local' ? `<details class="dzone"><summary>Delete my account</summary><form id="dl-form" class="stack"><p class="small muted" style="margin:0">This removes your account, your username and your friends list for good. Games you already played stay in other players' history.</p>
         <input id="dl-user" type="text" placeholder="Type your username to confirm" autocapitalize="none" spellcheck="false" required>
         <input id="dl-pw" type="password" placeholder="Your password" autocomplete="current-password" required>
         <p class="small" id="dl-err" role="alert" style="margin:0;color:var(--bad)"></p><button class="btn danger" type="submit">Delete my account forever</button></form></details>` : ''}
-      <p class="small muted" style="margin:0">Club 64 · version 15</p></div></div>`;
+      <p class="small muted" style="margin:0">Club 64 · version 16</p></div></div>`;
     mountAccountExtras();
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
@@ -4453,11 +4453,11 @@ function renderModal() {
   }
   if (m.type === 'notif') {
     const n = S.me && S.me.ntfy;
-    root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="Phone notifications"><h2>🔔 Phone notifications</h2>
-      <p class="muted" style="margin:0">Get a notification on your phone when someone challenges you, invites you to a tournament or messages you on Chat 64, and 5 minutes before a tournament you joined starts. It works even when Club 64 is closed.</p>
+    root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="Notifications"><h2>🔔 Notifications</h2>
+      <p class="muted" style="margin:0">Get a notification on your phone or computer when someone challenges you, invites you to a tournament or messages you on Chat 64, and 5 minutes before a tournament you joined starts. It works even when Club 64 is closed.</p>
       ${!n ? `<button class="btn primary" data-act="notif-on">Turn on</button>` : `
       <ol class="nsteps">
-        <li><b>Install the free ntfy app.</b><div class="row" style="margin-top:6px"><a class="btn sm" href="https://apps.apple.com/us/app/ntfy/id1625396347" target="_blank" rel="noopener">App Store (iPhone)</a><a class="btn sm" href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Google Play (Android)</a></div></li>
+        <li><b>Install the free ntfy app.</b><div class="row" style="margin-top:6px"><a class="btn sm" href="https://apps.apple.com/us/app/ntfy/id1625396347" target="_blank" rel="noopener">App Store (iPhone)</a><a class="btn sm" href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener">Google Play (Android)</a><a class="btn sm" href="https://ntfy.sh/app" target="_blank" rel="noopener">Computer (ntfy.sh/app)</a></div><p class="small muted" style="margin:6px 0 0">On a computer there's nothing to install: open ntfy.sh/app in your browser and allow notifications. You can use your phone and computer together.</p></li>
         <li><b>Subscribe to your private topic.</b> <span>In ntfy, tap +, paste this name, then tap Subscribe. Allow notifications if your phone asks.</span>
           <div class="linkbox" style="margin-top:6px"><input type="text" readonly value="${esc(n.topic)}" aria-label="Your topic" data-notr><button class="btn" data-act="notif-copy">Copy</button></div>
           <a class="small" href="ntfy://ntfy.sh/${esc(n.topic)}?display=Club+64">Android: open it in ntfy directly</a></li>
@@ -4567,9 +4567,9 @@ const ACTIONS = {
   'modal-close': () => { S.modal = null; renderModal(); },
   'notif-open': () => { S.modal = { type: 'notif' }; renderModal(); },
   'notif-on': async () => { if (await setNotif({ topic: 'c64-' + rid(20).toLowerCase(), ch: true, msg: true, tour: true, at: now() })) toast('Notifications are on. Now follow the 3 steps.'); },
-  'notif-off': async () => { if (await setNotif(null)) toast('Phone notifications are off.'); },
+  'notif-off': async () => { if (await setNotif(null)) toast('Notifications are off.'); },
   'notif-copy': () => { const n = S.me && S.me.ntfy; if (n) copyText(n.topic, 'Topic copied. Paste it in ntfy.', 'Your topic'); },
-  'notif-test': () => { const n = S.me && S.me.ntfy; if (!n) return; ntfyPost(n.topic, 'It works! You will get Club 64 notifications here. ♟️', { title: '✅ Club 64 test', click: siteURL('play'), tags: 'white_check_mark' }); toast('Sent! It should arrive on your phone in a few seconds.'); },
+  'notif-test': () => { const n = S.me && S.me.ntfy; if (!n) return; ntfyPost(n.topic, 'It works! You will get Club 64 notifications here. ♟️', { title: '✅ Club 64 test', click: siteURL('play'), tags: 'white_check_mark' }); toast('Sent! It should arrive in a few seconds.'); },
   'notif-kind': el => { setNotif({ [el.dataset.k]: el.checked }); },
   forgot: () => { S.modal = { type: 'forgot', name: ($('#au-name') && $('#au-name').value.trim()) || '' }; renderModal(); },
   'modal-bg': (el, e) => { if (e.target === el) { S.modal = null; renderModal(); } },
