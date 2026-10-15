@@ -2674,11 +2674,22 @@ function makeFirebaseDB(fs) {
         try { await r.update({ ...(extra || {}), [field]: firebase.firestore.FieldValue.arrayUnion(value) }); } catch (e) { throw err(e); }
       },
       onSnapshot(next, onErr) {
-        let last = null; const deliver = sn => { const w = wrapDoc(sn); const k = JSON.stringify(w.exists ? w.data() : null); if (k === last) return; last = k; next(w); };
-        const off = r.onSnapshot(sn => deliver(sn), e => onErr && onErr(err(e)));
-        let busy = false;
-        const poll = /^(games|tournaments|chats)\//.test(path) ? setInterval(() => { if (busy || document.visibilityState === 'hidden') return; busy = true; restGet(path).then(deliver).catch(() => {}).finally(() => { busy = false; }); }, path.startsWith('games/') ? 1500 : path.startsWith('chats/') ? 3000 : 5000) : null;
-        return () => { off(); if (poll) clearInterval(poll); };
+        let last = null, lastData = null; const deliver = sn => { const w = wrapDoc(sn); const k = JSON.stringify(w.exists ? w.data() : null); if (k === last) return; last = k; next(w); };
+        const off = r.onSnapshot(sn => { if (sn.exists) lastData = sn.data(); deliver(sn); }, e => onErr && onErr(err(e)));
+        let stopped = false, timer = null;
+        const gap = () => {
+          if (path.startsWith('chats/')) return 3000; if (!path.startsWith('games/')) return 5000;
+          const g = lastData; if (!g || g.status !== 'active') return 4000;
+          const mine = (g.players || []).includes(S.uid); if (!mine) return 1200;
+          const toMove = (g.ply || 0) % 2 === 0 ? g.white : g.black;
+          return toMove === S.uid ? 2000 : 600;
+        };
+        const tick = () => { if (stopped) return; if (document.visibilityState === 'hidden') { timer = setTimeout(tick, 1500); return; }
+          restGet(path).then(sn => { if (sn.exists) lastData = sn.data(); deliver(sn); }).catch(() => {}).finally(() => { if (!stopped) timer = setTimeout(tick, gap()); }); };
+        const polled = /^(games|tournaments|chats)\//.test(path); if (polled) timer = setTimeout(tick, 400);
+        const wake = () => { if (!polled || stopped || document.visibilityState === 'hidden') return; clearTimeout(timer); timer = setTimeout(tick, 50); };
+        document.addEventListener('visibilitychange', wake); window.addEventListener('focus', wake);
+        return () => { off(); stopped = true; clearTimeout(timer); document.removeEventListener('visibilitychange', wake); window.removeEventListener('focus', wake); };
       },
       collection: sub => collRef(path + '/' + sub),
     };
@@ -3358,8 +3369,11 @@ function renderBar() {
     <button class="iconbtn langbtn ${me ? '' : 'push'}" data-act="lang" aria-label="${LANG === 'ar' ? 'Switch to English' : 'Switch to Arabic'}" title="${LANG === 'ar' ? 'English' : 'عربي'}">${LANG === 'ar' ? 'EN' : 'ع'}</button>
     <button class="iconbtn" data-act="theme" aria-label="${curTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}" title="${curTheme() === 'dark' ? 'Light mode' : 'Dark mode'}">${curTheme() === 'dark' ? ICON_SUN : ICON_MOON}</button>`;
 }
+let renderHeld = false, lastSig = null;
 function renderNow() {
   rq = false;
+  if (drag && (S.route.view === 'game' || S.route.view === 'local') && $('#boardwrap')) { if (now() - (drag.t || 0) < 15000) { renderHeld = true; setTimeout(() => { if (renderHeld) render(); }, 800); return; } cancelDrag(); }
+  renderHeld = false;
   renderBar();
   const main = $('#main');
   let view = S.route.view;
@@ -3370,12 +3384,14 @@ function renderNow() {
   if (view === 'local' && !S.local) view = 'play';
   const V = VIEWS[view] || VIEWS.play;
   const key = view + ':' + (S.route.id || '');
-  if (key !== mountedKey) { mountedKey = key; main.innerHTML = V.html(); V.mount && V.mount(); window.scrollTo(0, 0); }
+  if (key !== mountedKey) { mountedKey = key; lastSig = null; main.innerHTML = V.html(); V.mount && V.mount(); window.scrollTo(0, 0); }
   else if (V.update) V.update();
   else {
     const a = document.activeElement; const id = a && a.id; let ss = null, se = null; try { ss = a.selectionStart; se = a.selectionEnd; } catch (e) {}
     const sy = window.scrollY;
-    main.innerHTML = V.html(); V.mount && V.mount();
+    const html = V.html(); const sig = view + '|' + html.replace(/(id="clk-[wb]"[^>]*>)[^<]*/g, '$1').replace(/(data-cd="\d+"[^>]*>)[^<]*/g, '$1');
+    if ((view === 'game' || view === 'local') && sig === lastSig && main.firstChild) { renderModal(); return; }
+    lastSig = sig; main.innerHTML = html; V.mount && V.mount();
     if (id) { const n = document.getElementById(id); if (n) { n.focus({ preventScroll: true }); try { if (ss != null) n.setSelectionRange(ss, se); } catch (e) {} } }
     window.scrollTo(0, sy);
   }
@@ -3970,7 +3986,7 @@ function boardHTML() {
   const preBtn = pl.length ? `<button class="precancel" data-act="pre-clear" aria-label="Clear premoves">✕ Clear ${pl.length} premove${pl.length === 1 ? '' : 's'}</button>` : '';
   return `<div class="board" id="board">${h}</div>${promo}${preBtn}`;
 }
-function drawBoard() { const bw = $('#boardwrap'); if (bw) bw.innerHTML = boardHTML(); queuePremoveCheck(); }
+function drawBoard() { const bw = $('#boardwrap'); if (bw) { bw.innerHTML = boardHTML(); if (drag && drag.moved) { const pc = bw.querySelector(`[data-sq="${drag.from}"] .pc`); if (pc) { pc.classList.add('drag-src'); drag.src = pc; } } } queuePremoveCheck(); }
 function tryMove(from, to) {
   const ctx = boardCtx(); if (!ctx) return;
   if (ctx.preMode) { const vb = virtualBoard(ctx); if (preTargets(vb, from).has(to)) addPremove(ctx, from, to); else { S.sel = null; drawBoard(); } return; }
@@ -3980,7 +3996,7 @@ function tryMove(from, to) {
   S.sel = null; ctx.onMove(from, to);
   drawBoard();
 }
-let drag = null;
+var drag = null;
 function bindBoard() {
   const bw = $('#boardwrap'); if (!bw || bw.dataset.bound) return; bw.dataset.bound = '1';
   bw.addEventListener('pointerdown', e => {
@@ -3994,7 +4010,7 @@ function bindBoard() {
         const already = S.sel === sq; S.sel = sq; drawBoard();
         const src = bw.querySelector(`[data-sq="${sq}"] .pc`); const rect = bw.querySelector(`[data-sq="${sq}"]`).getBoundingClientRect();
         const ghost = document.createElement('div'); ghost.className = `ghost pc ${vp.color}${vp.type}`; ghost.style.width = rect.width + 'px'; ghost.style.height = rect.height + 'px'; ghost.style.position = 'fixed'; ghost.style.inset = 'auto';
-        drag = { from: sq, ghost, src, w: rect.width, moved: false, already, x0: e.clientX, y0: e.clientY, id: e.pointerId };
+        drag = { t: now(), from: sq, ghost, src, w: rect.width, moved: false, already, x0: e.clientX, y0: e.clientY, id: e.pointerId };
         try { bw.setPointerCapture(e.pointerId); } catch (er) {}
       } else { if (S.sel) { S.sel = null; drawBoard(); } else clearPremoves(); }
       return;
@@ -4005,7 +4021,7 @@ function bindBoard() {
       const already = S.sel === sq; S.sel = sq; drawBoard();
       const src = bw.querySelector(`[data-sq="${sq}"] .pc`); const rect = bw.querySelector(`[data-sq="${sq}"]`).getBoundingClientRect();
       const ghost = document.createElement('div'); ghost.className = `ghost pc ${p.color}${p.type}`; ghost.style.width = rect.width + 'px'; ghost.style.height = rect.height + 'px'; ghost.style.position = 'fixed'; ghost.style.inset = 'auto';
-      drag = { from: sq, ghost, src, w: rect.width, moved: false, already, x0: e.clientX, y0: e.clientY, id: e.pointerId };
+      drag = { t: now(), from: sq, ghost, src, w: rect.width, moved: false, already, x0: e.clientX, y0: e.clientY, id: e.pointerId };
       try { bw.setPointerCapture(e.pointerId); } catch (er) {}
     } else { S.sel = null; drawBoard(); }
   });
@@ -4016,13 +4032,19 @@ function bindBoard() {
     drag.ghost.style.left = (e.clientX - drag.w / 2) + 'px'; drag.ghost.style.top = (e.clientY - drag.w / 2) + 'px';
   });
   const end = e => {
-    if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; d.ghost.remove();
+    if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; d.ghost.remove(); if (renderHeld) setTimeout(render, 0);
     if (!d.moved) { if (d.already) { S.sel = null; drawBoard(); } return; }
     const el = document.elementFromPoint(e.clientX, e.clientY); const t = el && el.closest && el.closest('[data-sq]');
     if (t && t.dataset.sq !== d.from) tryMove(d.from, t.dataset.sq); else drawBoard();
   };
   bw.addEventListener('pointerup', end); bw.addEventListener('pointercancel', end);
+  bw.addEventListener('lostpointercapture', e => { if (drag && e.pointerId === drag.id) setTimeout(() => { if (drag && drag.id === e.pointerId) cancelDrag(); }, 0); });
 }
+function cancelDrag() { const d = drag; drag = null; if (renderHeld) setTimeout(render, 0); if (d) d.ghost.remove(); document.querySelectorAll('body > .ghost').forEach(x => x.remove()); drawBoard(); }
+window.addEventListener('pointerup', e => { if (drag && e.pointerId === drag.id) { const bw = $('#boardwrap'); if (bw && bw.contains(e.target)) return; const d = drag; drag = null; d.ghost.remove();
+  if (!d.moved) return; const el = document.elementFromPoint(e.clientX, e.clientY); const t = el && el.closest && el.closest('[data-sq]'); if (t && t.dataset.sq !== d.from) tryMove(d.from, t.dataset.sq); else drawBoard(); if (renderHeld) setTimeout(render, 0); } }, true);
+window.addEventListener('pointercancel', e => { if (drag && e.pointerId === drag.id) cancelDrag(); }, true);
+window.addEventListener('blur', () => { if (drag) cancelDrag(); });
 function movesHTML(sans) {
   const total = sans.length; const cur = S.viewPly == null ? total : S.viewPly;
   const nav = `<div class="mvnav" role="group" aria-label="Browse moves">
@@ -4488,7 +4510,7 @@ function renderModal() {
         <input id="dl-user" type="text" placeholder="Type your username to confirm" autocapitalize="none" spellcheck="false" required>
         <input id="dl-pw" type="password" placeholder="Your password" autocomplete="current-password" required>
         <p class="small" id="dl-err" role="alert" style="margin:0;color:var(--bad)"></p><button class="btn danger" type="submit">Delete my account forever</button></form></details>` : ''}
-      <p class="small muted" style="margin:0">Club 64 · version 17</p></div></div>`;
+      <p class="small muted" style="margin:0">Club 64 · version 18</p></div></div>`;
     mountAccountExtras();
     $('#pw-form').addEventListener('submit', async e => {
       e.preventDefault(); const out = $('#pw-err'); out.style.color = 'var(--bad)';
