@@ -2877,7 +2877,7 @@ function go(view, id) {
   if (S.route && (S.route.view !== view || S.route.id !== id)) S.prevRoute = S.route;
   if (view !== 'chat') subChat(null);
   if (view !== 'game') subGameChat(null);
-  S.route = { view, id }; S.sel = null; S.pre = null; S.promo = null; S.viewRound = null; S.viewPly = null; S.emojiOpen = null;
+  S.route = { view, id }; S.sel = null; S.pre = null; S.promo = null; S.viewRound = null; S.viewPly = null; S.emojiOpen = null; if ((view === 'game' || view === 'local') && S.modal && ['a2hs', 'whatsnew', 'notif', 'account'].includes(S.modal.type)) { if (S.modal.type === 'a2hs') { try { if (localStorage.getItem('club64-a2hs') === '1') localStorage.removeItem('club64-a2hs'); } catch (e) {} } S.modal = null; try { renderModal(); } catch (e) {} }
   setTimeout(() => heartbeat(true), 50);
   if (view !== 'game') S.flip = false;
   try {
@@ -4699,7 +4699,7 @@ VIEWS.settings = {
     const u = $('#un-form'); if (u) u.addEventListener('submit', async e => { e.preventDefault(); const btn = u.querySelector('button'); btn.disabled = true; const msg = await changeUsername($('#un-new').value); btn.disabled = false; const er = $('#un-err'); if (er) er.textContent = msg || ''; });
   },
 };
-const APP_VERSION = 20;
+const APP_VERSION = 21;
 const WHATS_NEW = { v: 19, title: '🎉 Club 64 just got updated!', items: ['⚙️ New Settings page: tap the gear at the top.', '🖼️ Add a profile picture.', '✏️ Change your username.', '♟️ Turn premoves and move sounds on or off.'] };
 function maybeWhatsNew() {
   if (!S.me || S.modal) return; let seen = 0; try { seen = +(localStorage.getItem('club64-seen-ver') || 0); } catch (e) {}
@@ -4724,6 +4724,7 @@ function deviceKind() {
 let a2hsAt = 0;
 function maybeA2HS() {
   if (!S.me || S.modal || isStandalone() || S.mode === 'local' && location.protocol === 'file:') return;
+  if (S.route.view === 'game' || S.route.view === 'local' || (S.liveGames || []).some(g => g.status === 'active' && (g.players || []).includes(S.uid))) return;
   let seen = null; try { seen = localStorage.getItem('club64-a2hs'); } catch (e) { return; } if (seen) return;
   if (!a2hsAt) { a2hsAt = now() + 3500; setTimeout(render, 3700); return; } if (now() < a2hsAt) return;
   try { localStorage.setItem('club64-a2hs', '1'); } catch (e) {}
