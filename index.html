@@ -207,6 +207,7 @@ table.std tr.me td{background:var(--accent-soft)}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .15s}
 .switch:checked{background:var(--accent)}.switch:checked::after{transform:translateX(20px)}
 .iconbtn.on{background:var(--accent-soft);color:var(--accent)}.wnlist{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.4}
+.kbdi{display:inline-block;padding:0 6px;border:1px solid var(--line);border-radius:6px;font-size:.9em}
 .dzone{border:1px solid var(--line, rgba(0,0,0,.12));border-radius:10px;padding:10px 12px}.dzone summary{cursor:pointer;color:var(--bad);font-weight:700}.dzone[open] summary{margin-bottom:10px}
 .modal-in{background:var(--surface);border-radius:14px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:min(92vw,520px);box-shadow:var(--shadow)}
@@ -2407,6 +2408,12 @@ Object.assign(AR11, {
   '🎉 Club 64 just got updated!': '🎉 Club 64 اتحدّث!', '⚙️ New Settings page: tap the gear at the top.': '⚙️ صفحة إعدادات جديدة: دوس على الترس فوق.', '🖼️ Add a profile picture.': '🖼️ ضيف صورة للبروفايل.',
   '✏️ Change your username.': '✏️ غيّر اسمك.', '♟️ Turn premoves and move sounds on or off.': '♟️ شغّل أو اقفل النقلات المسبقة وصوت النقلات.', 'Open Settings': 'افتح الإعدادات', 'Got it': 'تمام',
 });
+Object.assign(AR11, {
+  'Make Club 64 easier to access by adding it to your home screen': 'خلّي Club 64 أسهل: ضيفه على الشاشة الرئيسية', 'One tap to open it, full screen, just like a real app.': 'دوسة واحدة ويفتح على الشاشة كلها، زي أي أبلكيشن.',
+  '📲 Add to home screen': '📲 ضيفه على الشاشة الرئيسية', 'Not now': 'مش دلوقتي', '📲 Add Club 64 to your home screen': '📲 ضيف Club 64 على الشاشة الرئيسية', 'How': 'إزاي',
+  'Only the club host can add bots.': 'صاحب النادي بس اللي يقدر يضيف بوتات.', 'No bots yet. The club host adds them.': 'لسه مفيش بوتات. صاحب النادي هو اللي بيضيفهم.',
+  'Club 64 is on your home screen now 🎉': 'Club 64 بقى على الشاشة الرئيسية 🎉', '✓ I already have it on my home screen': '✓ هو عندي على الشاشة الرئيسية أصلاً', 'Great, enjoy Club 64! ♟️': 'تمام، استمتع بـ Club 64! ♟️', 'Got it': 'تمام', 'Installing Club 64…': 'Club 64 بيتسطّب…',
+});
 for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
 const AR_CAT = { Bullet: 'بوليت', Blitz: 'بليتز', Rapid: 'رابيد', Classical: 'كلاسيك' };
 const AR_TAIL = s => s.replace(' · one device', ' · على جهاز واحد').replace(' · vs bot', ' · ضد بوت').replace(' · rated', ' · بتقييم');
@@ -3102,6 +3109,7 @@ const LEVELS = [
 const BOT_PHOTOS = {};
 const DEFAULT_BOTS = [];
 function allBots() { return [...DEFAULT_BOTS.map(b => ({ ...b, photo: BOT_PHOTOS[b.id] || null, builtin: true })), ...S.bots]; }
+function isClubOwner() { return S.mode === 'local' || !!(S.me && S.me.owner === true); }
 function uini(uid) { const p = uid === S.uid ? S.me : S.profiles[uid]; if (p && p.photo) return `<img class="uimg" src="${esc(p.photo)}" alt="">`; return esc(((p && p.username) || pname(uid) || '?')[0].toUpperCase()); }
 function avatar(name, photo, size) {
   const st = `width:${size}px;height:${size}px;font-size:${Math.round(size * .42)}px`;
@@ -3367,7 +3375,7 @@ document.addEventListener('pointerdown', () => { try { if (!actx) actx = new (wi
 
 /* ---------- rendering ---------- */
 let rq = false, mountedKey = null;
-function render() { if (rq) return; rq = true; requestAnimationFrame(() => { renderNow(); try { heartbeat(false); } catch (e) {} queuePremoveCheck(); try { if (S.route.view !== 'game' && S.route.view !== 'local') maybeWhatsNew(); } catch (e) {} }); }
+function render() { if (rq) return; rq = true; requestAnimationFrame(() => { renderNow(); try { heartbeat(false); } catch (e) {} queuePremoveCheck(); try { if (S.route.view !== 'game' && S.route.view !== 'local') { maybeWhatsNew(); maybeA2HS(); } } catch (e) {} }); }
 function toast(msg) { S.toast = { msg, at: now() }; renderToast(); setTimeout(() => { if (S.toast && now() - S.toast.at >= 3900) { S.toast = null; renderToast(); } }, 4000); }
 function renderToast() { $('#toast').innerHTML = S.toast ? `<div class="toast" role="status">${esc(S.toast.msg)}</div>` : ''; }
 function badgeCount() {
@@ -3640,7 +3648,7 @@ VIEWS.play = {
             <button class="btn ${S.mode === 'online' ? '' : 'primary'}" data-act="practice">Play on this device</button>
           </div>
         </section>
-        <section class="card stack"><div class="spread"><h2>Play a bot</h2><button class="btn sm" data-act="nav" data-v="bots">All bots</button></div><div class="row" style="gap:14px">${allBots().slice(0, 6).map(b => `<button data-act="bot-pick" data-id="${esc(b.id)}" style="background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:0" title="Play ${esc(b.name)}">${avatar(b.name, b.photo, 54)}<span class="small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:72px">${esc(b.name.split(' ')[0])}</span></button>`).join('')}<button data-act="bot-new" style="background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:0" title="Add a bot"><span style="width:54px;height:54px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:26px;color:var(--muted)">+</span><span class="small">Add a bot</span></button></div>${allBots().length ? '' : '<p class="small muted" style="margin:0">No bots yet. Add one: give it a name, a photo and a strength.</p>'}</section>
+        <section class="card stack"><div class="spread"><h2>Play a bot</h2><button class="btn sm" data-act="nav" data-v="bots">All bots</button></div><div class="row" style="gap:14px">${allBots().slice(0, 6).map(b => `<button data-act="bot-pick" data-id="${esc(b.id)}" style="background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:0" title="Play ${esc(b.name)}">${avatar(b.name, b.photo, 54)}<span class="small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:72px">${esc(b.name.split(' ')[0])}</span></button>`).join('')}${isClubOwner() ? `<button data-act="bot-new" style="background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:0" title="Add a bot"><span style="width:54px;height:54px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:26px;color:var(--muted)">+</span><span class="small">Add a bot</span></button>` : ''}</div>${allBots().length ? '' : `<p class="small muted" style="margin:0">${isClubOwner() ? 'No bots yet. Add one: give it a name, a photo and a strength.' : 'No bots yet. The club host adds them.'}</p>`}</section>
         <section class="card"><div class="spread" style="margin-bottom:8px"><h2>Your games</h2><button class="btn sm" data-act="nav" data-v="history">All games</button></div>${myGamesHTML()}</section>
       </div>
       <div class="stack">
@@ -4173,10 +4181,10 @@ VIEWS.local = {
 VIEWS.bots = {
   html() {
     const rec = botRecord();
-    const card = b => { const r = rec[b.id]; return `<div class="bot">${avatar(b.name, b.photo, 96)}<div class="nm">${esc(b.name)}</div>${meter(b.level)}<div class="small muted">Level ${b.level + 1} · ${LEVELS[b.level].n}</div>${r ? `<div class="rec">You ${r.w}W ${r.d}D ${r.l}L</div>` : '<div class="rec">Not played yet</div>'}<div class="row" style="justify-content:center"><button class="btn primary" data-act="bot-pick" data-id="${esc(b.id)}">Play</button>${!b.builtin && (b.createdBy === S.uid || S.mode === 'local') ? `<button class="btn sm" data-act="bot-del" data-id="${esc(b.id)}" aria-label="Delete ${esc(b.name)}">Delete</button>` : ''}</div></div>`; };
+    const card = b => { const r = rec[b.id]; return `<div class="bot">${avatar(b.name, b.photo, 96)}<div class="nm">${esc(b.name)}</div>${meter(b.level)}<div class="small muted">Level ${b.level + 1} · ${LEVELS[b.level].n}</div>${r ? `<div class="rec">You ${r.w}W ${r.d}D ${r.l}L</div>` : '<div class="rec">Not played yet</div>'}<div class="row" style="justify-content:center"><button class="btn primary" data-act="bot-pick" data-id="${esc(b.id)}">Play</button>${!b.builtin && isClubOwner() ? `<button class="btn sm" data-act="bot-del" data-id="${esc(b.id)}" aria-label="Delete ${esc(b.name)}">Delete</button>` : ''}</div></div>`; };
     return `<div class="stack">
       <div><span class="label">Practice</span><h1>Play the bots</h1><p class="muted">Pick an opponent and set how strong it plays. Levels run from 1 (makes lots of mistakes) to 8 (grandmaster strength).</p></div>
-      <div class="botgrid">${allBots().map(card).join('')}<button class="bot add" data-act="bot-new"><span class="plus">+</span>Add a bot<span class="small">Name it after a friend</span></button></div>
+      <div class="botgrid">${allBots().map(card).join('')}${isClubOwner() ? `<button class="bot add" data-act="bot-new"><span class="plus">+</span>Add a bot<span class="small">Name it after a friend</span></button>` : ''}</div>
     </div>`;
   },
 };
@@ -4553,6 +4561,15 @@ function renderModal() {
     });
     return;
   }
+  if (m.type === 'a2hs') {
+    const can = !!deferredInstall; const steps = a2hsSteps();
+    root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="Add Club 64 to your home screen">
+      <div class="row" style="gap:14px;align-items:center"><img src="icon-192.png" alt="" width="56" height="56" style="border-radius:14px;flex:none" onerror="this.style.display='none'"><h2 style="margin:0">Make Club 64 easier to access by adding it to your home screen</h2></div>
+      <p class="muted" style="margin:0">One tap to open it, full screen, just like a real app.</p>
+      ${can ? `<button class="btn primary lg" data-act="a2hs-install">📲 Add to home screen</button>` : `<ol class="nsteps">${steps.map(x => `<li>${x}</li>`).join('')}</ol>`}
+      <div class="row">${isStandalone() ? '' : `<button class="btn" data-act="a2hs-done">✓ I already have it on my home screen</button>`}<button class="btn" data-act="modal-close">${can ? 'Not now' : 'Got it'}</button></div></div></div>`;
+    return;
+  }
   if (m.type === 'whatsnew') {
     root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="What's new"><h2>${WHATS_NEW.title}</h2><ul class="wnlist">${WHATS_NEW.items.map(x => `<li>${x}</li>`).join('')}</ul>
       <div class="row"><button class="btn primary" data-act="wn-open">Open Settings</button><button class="btn" data-act="modal-close">Got it</button></div></div></div>`;
@@ -4672,16 +4689,17 @@ VIEWS.settings = {
       <section class="card stack"><h2>Account</h2>
         ${S.mode === 'online' ? `<div class="setrow"><span class="grow"><b>🔔 Notifications</b><span class="small muted" style="display:block">${me.ntfy ? 'On' : 'Off'}</span></span><button class="btn sm" data-act="notif-open">Open</button></div>` : ''}
         <div class="setrow"><span class="grow"><b>Password, recovery email and account</b></span><button class="btn sm" data-act="account">Open</button></div>
+        ${isStandalone() ? '' : `<div class="setrow"><span class="grow"><b>📲 Add Club 64 to your home screen</b></span><button class="btn sm" data-act="a2hs-open">How</button></div>`}
         <div class="setrow"><span class="grow"><b>Log out</b></span><button class="btn sm danger" data-act="logout">Log out</button></div>
       </section>
-      <p class="small muted" style="text-align:center">Club 64 · version ${APP_VERSION}</p></div>`;
+      <p class="small muted" style="text-align:center">Club 64 · version ${APP_VERSION}${isClubOwner() && S.mode === 'online' ? ' · 👑 Club host' : ''}<br><span data-notr style="opacity:.7">Player ID: ${esc(S.uid)}</span></p></div>`;
   },
   mount() {
     const f = $('#set-photo'); if (f) f.addEventListener('change', () => { const file = f.files && f.files[0]; if (file) savePhoto(file); });
     const u = $('#un-form'); if (u) u.addEventListener('submit', async e => { e.preventDefault(); const btn = u.querySelector('button'); btn.disabled = true; const msg = await changeUsername($('#un-new').value); btn.disabled = false; const er = $('#un-err'); if (er) er.textContent = msg || ''; });
   },
 };
-const APP_VERSION = 19;
+const APP_VERSION = 20;
 const WHATS_NEW = { v: 19, title: '🎉 Club 64 just got updated!', items: ['⚙️ New Settings page: tap the gear at the top.', '🖼️ Add a profile picture.', '✏️ Change your username.', '♟️ Turn premoves and move sounds on or off.'] };
 function maybeWhatsNew() {
   if (!S.me || S.modal) return; let seen = 0; try { seen = +(localStorage.getItem('club64-seen-ver') || 0); } catch (e) {}
@@ -4690,6 +4708,37 @@ function maybeWhatsNew() {
   S.modal = { type: 'whatsnew' }; renderModal();
 }
 
+
+/* ---------- add-to-home-screen prompt ---------- */
+let deferredInstall = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; if (S.modal && S.modal.type === 'a2hs') renderModal(); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; if (S.modal && S.modal.type === 'a2hs') { S.modal = null; renderModal(); } toast('Club 64 is on your home screen now 🎉'); });
+const isStandalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
+function deviceKind() {
+  const ua = navigator.userAgent || ''; const touchMac = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  if (/iPhone|iPad|iPod/.test(ua) || touchMac) return /CriOS|FxiOS|EdgiOS/.test(ua) ? 'ios-other' : 'ios';
+  if (/Android/.test(ua)) return 'android';
+  if (/Edg\//.test(ua)) return 'edge'; if (/Firefox\//.test(ua)) return 'firefox'; if (/Chrome\//.test(ua)) return 'chrome'; if (/Safari\//.test(ua)) return 'mac-safari';
+  return 'other';
+}
+let a2hsAt = 0;
+function maybeA2HS() {
+  if (!S.me || S.modal || isStandalone() || S.mode === 'local' && location.protocol === 'file:') return;
+  let seen = null; try { seen = localStorage.getItem('club64-a2hs'); } catch (e) { return; } if (seen) return;
+  if (!a2hsAt) { a2hsAt = now() + 3500; setTimeout(render, 3700); return; } if (now() < a2hsAt) return;
+  try { localStorage.setItem('club64-a2hs', '1'); } catch (e) {}
+  S.modal = { type: 'a2hs' }; renderModal();
+}
+function a2hsSteps() {
+  const k = deviceKind(); const share = '<span class="kbdi">⎋</span>';
+  if (k === 'ios') return ['Tap the <b>Share</b> button <span class="kbdi">⬆︎</span> (square with an arrow), at the bottom of Safari on iPhone or the top on iPad.', 'Scroll down and tap <b>Add to Home Screen</b>.', 'Tap <b>Add</b>. Club 64 now opens like an app.'];
+  if (k === 'ios-other') return ['Open this page in <b>Safari</b> (iPhone and iPad only allow this from Safari).', 'Tap <b>Share</b> <span class="kbdi">⬆︎</span>, then <b>Add to Home Screen</b>, then <b>Add</b>.'];
+  if (k === 'android') return ['Tap the <b>⋮</b> menu at the top right of Chrome.', 'Tap <b>Add to Home screen</b> (or <b>Install app</b>).', 'Tap <b>Add</b>.'];
+  if (k === 'edge') return ['Click the <b>…</b> menu at the top right of Edge.', 'Go to <b>Apps → Install this site as an app</b>.', 'Click <b>Install</b>. Club 64 gets its own window and desktop icon.'];
+  if (k === 'chrome') return ['Click the <b>⋮</b> menu at the top right of Chrome.', 'Go to <b>Cast, save and share → Install page as app</b> (or click the install icon at the right of the address bar).', 'Click <b>Install</b>. Club 64 gets its own window and desktop icon.'];
+  if (k === 'mac-safari') return ['In Safari, open the <b>File</b> menu.', 'Click <b>Add to Dock</b>, then <b>Add</b>.'];
+  return ['Bookmark this page (<b>Ctrl+D</b>, or <b>⌘+D</b> on Mac) so it is one click away.', 'Or open it in Chrome or Edge to install it as an app.'];
+}
 /* ---------- phone notifications via the free ntfy app ---------- */
 const NTFY = 'https://ntfy.sh/';
 const ntfyOf = uid => { const p = uid === S.uid ? S.me : S.profiles[uid]; return p && p.ntfy && p.ntfy.topic ? p.ntfy : null; };
@@ -4749,6 +4798,9 @@ const ACTIONS = {
   logout: () => { S.modal = null; renderModal(); signOut(); },
   'auth-tab': el => { S.authMode = el.dataset.m; mountedKey = null; renderNow(); },
   'modal-close': () => { S.modal = null; renderModal(); },
+  'a2hs-done': () => { try { localStorage.setItem('club64-a2hs', 'done'); } catch (e) {} S.modal = null; renderModal(); toast('Great, enjoy Club 64! ♟️'); },
+  'a2hs-open': () => { S.modal = { type: 'a2hs' }; renderModal(); },
+  'a2hs-install': async () => { const d = deferredInstall; if (!d) return; deferredInstall = null; try { d.prompt(); const r = await d.userChoice; S.modal = null; renderModal(); if (r && r.outcome === 'accepted') toast('Installing Club 64…'); } catch (e) { S.modal = null; renderModal(); } },
   'wn-open': () => { S.modal = null; renderModal(); go('settings'); },
   pref: el => setPref(el.dataset.k, el.checked),
   'photo-remove': async () => { try { await S.db.doc('profiles/' + S.uid).update({ photo: null }); S.me = { ...S.me, photo: null }; toast('Picture removed.'); mountedKey = null; render(); } catch (e) { toast("Couldn't save that."); } },
@@ -4849,15 +4901,15 @@ const ACTIONS = {
   'bs-noclock': () => { S.modal.tc = null; renderModal(); },
   'bs-tc': el => { S.modal.tc = [+el.dataset.b, +el.dataset.i]; renderModal(); },
   'bs-start': () => { const m = S.modal; const b = allBots().find(x => x.id === m.id); S.modal = null; renderModal(); if (b) startBotGame(b, m.level, m.color, m.tc); },
-  'bot-new': () => { S.modal = { type: 'bot-add', name: '', photo: null, level: 2 }; renderModal(); setTimeout(() => { const n = $('#ba-name'); if (n) n.focus(); }, 30); },
+  'bot-new': () => { if (!isClubOwner()) { toast('Only the club host can add bots.'); return; } S.modal = { type: 'bot-add', name: '', photo: null, level: 2 }; renderModal(); setTimeout(() => { const n = $('#ba-name'); if (n) n.focus(); }, 30); },
   'ba-level': el => { S.modal.level = +el.dataset.l; renderModal(); },
   'ba-nophoto': () => { S.modal.photo = null; renderModal(); },
-  'ba-save': async () => {
+  'ba-save': async () => { if (!isClubOwner()) return;
     const m = S.modal; const name = (m.name || '').trim();
     if (name.length < 2) { $('#ba-err').textContent = 'Give the bot a name.'; return; }
     try { await w(S.db.collection('bots').add({ name: name.slice(0, 40), photo: m.photo || null, level: m.level, createdBy: S.uid, createdAt: now() })); S.modal = null; renderModal(); toast(name + ' is ready to play.'); } catch (e) {}
   },
-  'bot-del': el => { const b = S.bots.find(x => x.id === el.dataset.id); if (!b) return; confirmBox(`Delete ${b.name}?`, 'The bot is removed for everyone.', 'Delete bot', () => w(S.db.doc('bots/' + b.id).delete()).catch(() => {}), true); },
+  'bot-del': el => { if (!isClubOwner()) return; const b = S.bots.find(x => x.id === el.dataset.id); if (!b) return; confirmBox(`Delete ${b.name}?`, 'The bot is removed for everyone.', 'Delete bot', () => w(S.db.doc('bots/' + b.id).delete()).catch(() => {}), true); },
   'fr-add': el => { const u = el.dataset.u; if (blocksMe(u) || isBlocked(u)) { toast("You can't add this player."); return; } w(S.db.doc('friends/' + pairId(S.uid, u)).set({ members: [S.uid, u], from: S.uid, to: u, status: 'pending', createdAt: now() })).then(() => toast('Friend request sent.')).catch(() => {}); },
   'fr-accept': el => { w(S.db.doc('friends/' + el.dataset.id).update({ status: 'accepted', acceptedAt: now() })).catch(() => {}); },
   'fr-remove': el => { w(S.db.doc('friends/' + el.dataset.id).delete()).catch(() => {}); },
