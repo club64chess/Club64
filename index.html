@@ -2410,7 +2410,7 @@ Object.assign(AR11, {
 });
 Object.assign(AR11, {
   'Make Club 64 easier to access by adding it to your home screen': 'خلّي Club 64 أسهل: ضيفه على الشاشة الرئيسية', 'One tap to open it, full screen, just like a real app.': 'دوسة واحدة ويفتح على الشاشة كلها، زي أي أبلكيشن.',
-  '📲 Add to home screen': '📲 ضيفه على الشاشة الرئيسية', 'Not now': 'مش دلوقتي', '📲 Add Club 64 to your home screen': '📲 ضيف Club 64 على الشاشة الرئيسية', 'How': 'إزاي',
+  '📲 Add to home screen': '📲 ضيفه على الشاشة الرئيسية', 'Not now': 'مش دلوقتي', '📲 Add Club 64 to your home screen': '📲 ضيف Club 64 على الشاشة الرئيسية', '📲 Home screen': '📲 الشاشة الرئيسية', "✓ You opened Club 64 from your home screen, so it's already added on this device.": '✓ إنت فاتح Club 64 من الشاشة الرئيسية، يعني هو متضاف خلاص على الجهاز ده.', 'How': 'إزاي',
   'Only the club host can add bots.': 'صاحب النادي بس اللي يقدر يضيف بوتات.', 'No bots yet. The club host adds them.': 'لسه مفيش بوتات. صاحب النادي هو اللي بيضيفهم.',
   'Club 64 is on your home screen now 🎉': 'Club 64 بقى على الشاشة الرئيسية 🎉', '✓ I already have it on my home screen': '✓ هو عندي على الشاشة الرئيسية أصلاً', 'Great, enjoy Club 64! ♟️': 'تمام، استمتع بـ Club 64! ♟️', 'Got it': 'تمام', 'Installing Club 64…': 'Club 64 بيتسطّب…',
 });
@@ -4689,7 +4689,7 @@ VIEWS.settings = {
       <section class="card stack"><h2>Account</h2>
         ${S.mode === 'online' ? `<div class="setrow"><span class="grow"><b>🔔 Notifications</b><span class="small muted" style="display:block">${me.ntfy ? 'On' : 'Off'}</span></span><button class="btn sm" data-act="notif-open">Open</button></div>` : ''}
         <div class="setrow"><span class="grow"><b>Password, recovery email and account</b></span><button class="btn sm" data-act="account">Open</button></div>
-        ${isStandalone() ? '' : `<div class="setrow"><span class="grow"><b>📲 Add Club 64 to your home screen</b></span><button class="btn sm" data-act="a2hs-open">How</button></div>`}
+        ${isStandalone() ? `<div class="setrow"><span class="grow"><b>📲 Home screen</b><span class="small muted" style="display:block">✓ You opened Club 64 from your home screen, so it's already added on this device.</span></span></div>` : `<div class="setrow"><span class="grow"><b>📲 Add Club 64 to your home screen</b></span><button class="btn sm" data-act="a2hs-open">How</button></div>`}
         <div class="setrow"><span class="grow"><b>Log out</b></span><button class="btn sm danger" data-act="logout">Log out</button></div>
       </section>
       <p class="small muted" style="text-align:center">Club 64 · version ${APP_VERSION}${isClubOwner() && S.mode === 'online' ? ' · 👑 Club host' : ''}<br><span data-notr style="opacity:.7">Player ID: ${esc(S.uid)}</span></p></div>`;
@@ -4699,7 +4699,7 @@ VIEWS.settings = {
     const u = $('#un-form'); if (u) u.addEventListener('submit', async e => { e.preventDefault(); const btn = u.querySelector('button'); btn.disabled = true; const msg = await changeUsername($('#un-new').value); btn.disabled = false; const er = $('#un-err'); if (er) er.textContent = msg || ''; });
   },
 };
-const APP_VERSION = 21;
+const APP_VERSION = 22;
 const WHATS_NEW = { v: 19, title: '🎉 Club 64 just got updated!', items: ['⚙️ New Settings page: tap the gear at the top.', '🖼️ Add a profile picture.', '✏️ Change your username.', '♟️ Turn premoves and move sounds on or off.'] };
 function maybeWhatsNew() {
   if (!S.me || S.modal) return; let seen = 0; try { seen = +(localStorage.getItem('club64-seen-ver') || 0); } catch (e) {}
