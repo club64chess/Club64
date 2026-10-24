@@ -3454,12 +3454,12 @@ function renderNow() {
     const a = document.activeElement; const id = a && a.id; let ss = null, se = null; try { ss = a.selectionStart; se = a.selectionEnd; } catch (e) {}
     const sy = window.scrollY;
     const html = V.html(); const sig = view + '|' + html.replace(/(id="clk-[wb]"[^>]*>)[^<]*/g, '$1').replace(/(data-cd="\d+"[^>]*>)[^<]*/g, '$1');
-    if ((view === 'game' || view === 'local') && sig === lastSig && main.firstChild) { renderModal(); return; }
+    if ((view === 'game' || view === 'local' || view === 'settings') && sig === lastSig && main.firstChild) { renderModal(true); return; }
     lastSig = sig; main.innerHTML = html; V.mount && V.mount();
     if (id) { const n = document.getElementById(id); if (n) { n.focus({ preventScroll: true }); try { if (ss != null) n.setSelectionRange(ss, se); } catch (e) {} } }
     window.scrollTo(0, sy);
   }
-  renderModal();
+  renderModal(true);
   tickUI();
 }
 function modeBanner() {
@@ -4530,8 +4530,11 @@ VIEWS.friends = {
 };
 
 /* modal */
-function renderModal() {
+function renderModal(auto) {
   const m = S.modal; const root = $('#modal');
+  // background page refreshes must not rebuild an open window (it would wipe what the player is typing)
+  if (auto === true && m && root.dataset.mtype === m.type && root.firstChild) return;
+  root.dataset.mtype = m ? m.type : '';
   if (!m) { root.innerHTML = ''; return; }
   if (m.type === 'challenge') root.innerHTML = `<div class="modal" data-act="modal-bg"><div class="modal-in" role="dialog" aria-label="Challenge"><h2>Challenge ${esc(pname(m.to))}</h2>${tcPicker(m.tc, 'mtc')}<div class="row"><button class="btn primary" data-act="ch-send">Send challenge · ${fmtTC(m.tc[0], m.tc[1])}</button><button class="btn" data-act="modal-close">Cancel</button></div></div></div>`;
   if (m.type === 'bot-setup') {
@@ -4820,7 +4823,7 @@ VIEWS.settings = {
         <div class="row" style="gap:16px;align-items:center"><span class="pav big">${uini(S.uid)}</span>
           <div class="stack" style="gap:8px"><div class="row"><label class="btn" for="set-photo">📷 ${me.photo ? 'Change picture' : 'Add a picture'}</label><input id="set-photo" type="file" accept="image/*" hidden>${me.photo ? '<button class="btn" data-act="photo-remove">Remove</button>' : ''}</div><span class="small muted">Your friends see it in chats, games and your profile.</span></div></div>
         <form id="un-form" class="stack" style="gap:8px"><label class="label" for="un-new">Username</label>
-          <div class="row"><input id="un-new" type="text" maxlength="20" autocapitalize="none" spellcheck="false" value="${esc(me.username)}" style="flex:1;min-width:160px"><button class="btn primary" type="submit">Change username</button></div>
+          <div class="row"><input id="un-new" type="text" maxlength="20" autocapitalize="none" spellcheck="false" value="${esc(S.unDraft != null ? S.unDraft : me.username)}" style="flex:1;min-width:160px"><button class="btn primary" type="submit">Change username</button></div>
           <p class="small muted" style="margin:0">3 to 20 letters, numbers or underscores. You'll log in with the new name. You can change it once a week.</p>
           <p class="small" id="un-err" role="alert" style="margin:0;color:var(--bad)"></p></form>
       </section>
@@ -4842,10 +4845,11 @@ VIEWS.settings = {
   },
   mount() {
     const f = $('#set-photo'); if (f) f.addEventListener('change', () => { const file = f.files && f.files[0]; if (file) savePhoto(file); });
-    const u = $('#un-form'); if (u) u.addEventListener('submit', async e => { e.preventDefault(); const btn = u.querySelector('button'); btn.disabled = true; const msg = await changeUsername($('#un-new').value); btn.disabled = false; const er = $('#un-err'); if (er) er.textContent = msg || ''; });
+    const un = $('#un-new'); if (un) un.addEventListener('input', () => { S.unDraft = un.value; });
+    const u = $('#un-form'); if (u) u.addEventListener('submit', async e => { e.preventDefault(); const btn = u.querySelector('button'); btn.disabled = true; const msg = await changeUsername($('#un-new').value); if (!msg) S.unDraft = null; btn.disabled = false; const er = $('#un-err'); if (er) er.textContent = msg || ''; });
   },
 };
-const APP_VERSION = 25;
+const APP_VERSION = 26;
 const WHATS_NEW = { v: 19, title: '🎉 Club 64 just got updated!', items: ['⚙️ New Settings page: tap the gear at the top.', '🖼️ Add a profile picture.', '✏️ Change your username.', '♟️ Turn premoves and move sounds on or off.'] };
 function maybeWhatsNew() {
   if (!S.me || S.modal) return; let seen = 0; try { seen = +(localStorage.getItem('club64-seen-ver') || 0); } catch (e) {}
