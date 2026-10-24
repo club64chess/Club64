@@ -208,6 +208,15 @@ table.std tr.me td{background:var(--accent-soft)}
 .switch:checked{background:var(--accent)}.switch:checked::after{transform:translateX(20px)}
 .iconbtn.on{background:var(--accent-soft);color:var(--accent)}.wnlist{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.4}
 .kbdi{display:inline-block;padding:0 6px;border:1px solid var(--line);border-radius:6px;font-size:.9em}
+.offbot{background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;width:84px;padding:0;color:inherit}
+body.ckmode{overflow:hidden}body.ckmode #bar,body.ckmode #toast{display:none}body.ckmode #main{padding:0;max-width:none}
+.ckwrap{position:fixed;inset:0;display:flex;flex-direction:column;background:#111;z-index:40;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.ck-half{flex:1;border:0;margin:0;display:grid;place-items:center;background:#2a2f37;color:#e9edf2;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.ck-half.top .ck-in{transform:rotate(180deg)}.ck-in{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ck-time{font:800 clamp(64px,19vw,190px)/1 var(--f-mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}.ck-moves{font-size:15px;opacity:.75;min-height:18px}.ck-hint{font-size:15px;opacity:.85;min-height:18px}
+.ck-half.on{background:#b5651d;color:#fff}.ck-half.on.low{background:#c62828}.ck-half.flag{background:#7f1d1d;color:#fff}.ck-half.paused{background:#5b4a32}
+.ck-bar{display:flex;justify-content:center;gap:18px;padding:8px;background:#111}.ck-ctl{width:52px;height:52px;border-radius:50%;border:1px solid #444;background:#1d2128;color:#fff;font-size:20px;display:grid;place-items:center;cursor:pointer}.ck-ctl:disabled{opacity:.4}
+@media (min-width:900px) and (orientation:landscape){.ckwrap{flex-direction:row}.ck-half.top .ck-in{transform:none}.ck-bar{flex-direction:column;justify-content:center}}
 .dzone{border:1px solid var(--line, rgba(0,0,0,.12));border-radius:10px;padding:10px 12px}.dzone summary{cursor:pointer;color:var(--bad);font-weight:700}.dzone[open] summary{margin-bottom:10px}
 .modal-in{background:var(--surface);border-radius:14px;padding:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;z-index:60;font-weight:600;max-width:min(92vw,520px);box-shadow:var(--shadow)}
@@ -380,7 +389,7 @@ html[lang=ar] .label{letter-spacing:0}
 </style>
 
 <header class="bar"><div class="bar-in" id="bar"></div></header>
-<main class="wrap" id="main"><div class="splash"><div class="stack" style="align-items:center"><h2>Setting up the board…</h2><p class="muted">Connecting to Club 64</p></div></div></main>
+<main class="wrap" id="main"><div class="splash"><div class="stack" style="align-items:center"><h2>Setting up the board…</h2><p class="muted">Connecting to Club 64</p><button class="btn" data-act="off-open" style="margin-top:12px">📴 No internet? Offline Mode</button></div></div></main>
 <div id="modal"></div>
 <div id="toast"></div>
 
@@ -2414,10 +2423,28 @@ Object.assign(AR11, {
   'Only the club host can add bots.': 'صاحب النادي بس اللي يقدر يضيف بوتات.', 'No bots yet. The club host adds them.': 'لسه مفيش بوتات. صاحب النادي هو اللي بيضيفهم.',
   'Club 64 is on your home screen now 🎉': 'Club 64 بقى على الشاشة الرئيسية 🎉', '✓ I already have it on my home screen': '✓ هو عندي على الشاشة الرئيسية أصلاً', 'Great, enjoy Club 64! ♟️': 'تمام، استمتع بـ Club 64! ♟️', 'Got it': 'تمام', 'Installing Club 64…': 'Club 64 بيتسطّب…',
 });
+Object.assign(AR11, {
+  '📴 Offline Mode': '📴 وضع الأوفلاين', 'Works without internet': 'شغال من غير نت', '← Back to Club 64': '→ ارجع لـ Club 64', 'Log in': 'ادخل',
+  'Everything here works with no Wi-Fi and no data. Open Club 64 once with internet so your phone keeps a copy.': 'كل حاجة هنا شغالة من غير واي فاي ولا باقة. افتح Club 64 مرة واحدة بالنت عشان موبايلك يحتفظ بنسخة.',
+  '⏱️ Clock64': '⏱️ Clock64', 'A real chess clock for over-the-board games: every time control, increment or delay.': 'ساعة شطرنج حقيقية للعب على الرقعة: كل أنظمة الوقت والزيادة والتأخير.',
+  'Open Clock64': 'افتح Clock64', '👥 Play on this device': '👥 العب على الجهاز ده', 'Start game': 'ابدأ الماتش', '🤖 Play the bots': '🤖 العب ضد البوتات',
+  "No bots saved on this device yet. Open Club 64 once with internet to download the club's bots.": 'لسه مفيش بوتات على الجهاز ده. افتح Club 64 مرة بالنت عشان البوتات تتنزل.',
+  'A chess clock for over-the-board games, with every time control.': 'ساعة شطرنج للعب على الرقعة، بكل أنظمة الوقت.', 'Chess clock': 'ساعة شطرنج', '← Back': '→ رجوع',
+  'Custom': 'على مزاجك', 'Minutes each': 'دقايق لكل لاعب', 'Player 1 minutes': 'دقايق اللاعب ١', 'Player 2 minutes': 'دقايق اللاعب ٢', 'Seconds per move': 'ثواني لكل نقلة', 'Type': 'النوع',
+  'Increment': 'زيادة', 'Delay': 'تأخير', 'Bronstein': 'برونشتاين', 'None': 'من غير',
+  'Increment: the seconds are added after every move.': 'زيادة: الثواني بتتضاف بعد كل نقلة.', 'Delay: your clock waits that many seconds before it starts counting down.': 'تأخير: ساعتك بتستنى الثواني دي قبل ما تبدأ تعد.',
+  'Bronstein: you get back the time you used on a move, up to that many seconds.': 'برونشتاين: بيرجعلك الوقت اللي استخدمته في النقلة، لحد عدد الثواني ده.', 'No extra time per move.': 'مفيش وقت زيادة مع النقلة.',
+  'Different time for each player': 'وقت مختلف لكل لاعب', 'Give a stronger player less time': 'ادي اللاعب الأقوى وقت أقل', 'Sounds': 'الأصوات',
+  '← Back to the running clock': '→ ارجع للساعة', 'Tap to start the other clock': 'دوس عشان تشغّل ساعة التاني', 'Tap when you have moved': 'دوس بعد ما تلعب نقلتك', 'Paused': 'متوقفة',
+  '⏰ Time is up!': '⏰ الوقت خلص!', '🏆 Wins on time': '🏆 كسب بالوقت', 'Reset the clock?': 'نرجّع الساعة من الأول؟', 'Both clocks go back to the start time.': 'الساعتين هيرجعوا لوقت البداية.', 'Reset': 'رجّع',
+  'Set the minutes first.': 'حط الدقايق الأول.', "You're offline. 📴 Offline Mode still works.": 'إنت أوفلاين. 📴 وضع الأوفلاين لسه شغال.', '📴 No internet? Offline Mode': '📴 مفيش نت؟ وضع الأوفلاين',
+  '📴 No internet? Use Offline Mode (bots, Clock64, play on one device)': '📴 مفيش نت؟ استخدم وضع الأوفلاين (بوتات، Clock64، اللعب على جهاز واحد)', "You're offline.": 'إنت أوفلاين.',
+});
 for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
 const AR_CAT = { Bullet: 'بوليت', Blitz: 'بليتز', Rapid: 'رابيد', Classical: 'كلاسيك' };
 const AR_TAIL = s => s.replace(' · one device', ' · على جهاز واحد').replace(' · vs bot', ' · ضد بوت').replace(' · rated', ' · بتقييم');
 const AR_RX = [
+  [/^Start clock · (.+)$/, (m, a) => `شغّل الساعة · ${a}`], [/^Moves: (\d+)$/, (m, a) => `النقلات: ${a}`],
   [/^Your username is now (.+)\. Log in with it from now on\.$/, (m, a) => `اسمك بقى ${a}. ادخل بيه من هنا ورايح.`],
   [/^You can change your username again in (\d+) days?\.$/, (m, a) => `تقدر تغيّر اسمك تاني بعد ${a} يوم.`],
   [/^Club 64 · version (\d+)$/, (m, a) => `Club 64 · نسخة ${a}`],
@@ -2840,7 +2867,7 @@ function startSubs() {
     db.doc('chats/club').onSnapshot(s => { S.club = s.exists ? { ...s.data(), id: 'club' } : null; render(); }, () => {});
     setTimeout(() => heartbeat(true), 500);
   }
-  db.collection('bots').limit(200).onSnapshot(s => { S.bots = s.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => a.createdAt - b.createdAt); render(); }, subErr);
+  db.collection('bots').limit(200).onSnapshot(s => { S.bots = s.docs.map(d => ({ ...d.data(), id: d.id })).sort((a, b) => a.createdAt - b.createdAt); cacheBots(); render(); }, subErr);
   db.collection('tournaments').orderBy('startAt', 'desc').limit(100).onSnapshot(s => { S.tournaments = s.docs.map(d => ({ ...d.data(), id: d.id })); render(); scheduleReminderSync(); }, subErr);
 }
 
@@ -2877,7 +2904,8 @@ function go(view, id) {
   if (S.route && (S.route.view !== view || S.route.id !== id)) S.prevRoute = S.route;
   if (view !== 'chat') subChat(null);
   if (view !== 'game') subGameChat(null);
-  S.route = { view, id }; S.sel = null; S.pre = null; S.promo = null; S.viewRound = null; S.viewPly = null; S.emojiOpen = null; if ((view === 'game' || view === 'local') && S.modal && ['a2hs', 'whatsnew', 'notif', 'account'].includes(S.modal.type)) { if (S.modal.type === 'a2hs') { try { if (localStorage.getItem('club64-a2hs') === '1') localStorage.removeItem('club64-a2hs'); } catch (e) {} } S.modal = null; try { renderModal(); } catch (e) {} }
+  if (view !== 'clock') { document.body.classList.remove('ckmode'); clearInterval(ck.timer); ckWake(false); }
+  S.route = { view, id }; S.sel = null; S.pre = null; S.promo = null; S.viewRound = null; S.viewPly = null; S.emojiOpen = null; if ((view === 'game' || view === 'local' || view === 'clock') && S.modal && ['a2hs', 'whatsnew', 'notif', 'account'].includes(S.modal.type)) { if (S.modal.type === 'a2hs') { try { if (localStorage.getItem('club64-a2hs') === '1') localStorage.removeItem('club64-a2hs'); } catch (e) {} } S.modal = null; try { renderModal(); } catch (e) {} }
   setTimeout(() => heartbeat(true), 50);
   if (view !== 'game') S.flip = false;
   try {
@@ -2890,7 +2918,7 @@ function routeFromHash() {
   const h = (location.hash || '').slice(1);
   if (h.startsWith('t-')) return { view: 'tour', id: h.slice(2) };
   if (h.startsWith('g-')) return { view: 'game', id: h.slice(2) };
-  if (['play', 'tours', 'friends', 'bots', 'history', 'chat', 'settings'].includes(h)) return { view: h };
+  if (['play', 'tours', 'friends', 'bots', 'history', 'chat', 'settings', 'offline', 'clock'].includes(h)) return { view: h };
   return { view: 'play' };
 }
 function syncContext() {
@@ -3375,7 +3403,7 @@ document.addEventListener('pointerdown', () => { try { if (!actx) actx = new (wi
 
 /* ---------- rendering ---------- */
 let rq = false, mountedKey = null;
-function render() { if (rq) return; rq = true; requestAnimationFrame(() => { renderNow(); try { heartbeat(false); } catch (e) {} queuePremoveCheck(); try { if (S.route.view !== 'game' && S.route.view !== 'local') { maybeWhatsNew(); maybeA2HS(); } } catch (e) {} }); }
+function render() { if (rq) return; rq = true; requestAnimationFrame(() => { renderNow(); try { heartbeat(false); } catch (e) {} queuePremoveCheck(); try { if (S.route.view !== 'game' && S.route.view !== 'local' && S.route.view !== 'clock') { maybeWhatsNew(); maybeA2HS(); } } catch (e) {} }); }
 function toast(msg) { S.toast = { msg, at: now() }; renderToast(); setTimeout(() => { if (S.toast && now() - S.toast.at >= 3900) { S.toast = null; renderToast(); } }, 4000); }
 function renderToast() { $('#toast').innerHTML = S.toast ? `<div class="toast" role="status">${esc(S.toast.msg)}</div>` : ''; }
 function badgeCount() {
@@ -3399,7 +3427,8 @@ function renderBar() {
     </nav>`}
     ${me ? `<button class="me-chip" data-act="account" style="background:none;border:0;cursor:pointer;padding:0" aria-label="Account"><span class="av">${uini(S.uid)}</span><span class="nm">${esc(me.username)}</span><span class="rt pill mono" title="${CAT_NAME[cat]} rating">${CAT_NAME[cat]} ${rating(S.uid, cat)}</span></button>` : ''}
     ${me ? `<button class="iconbtn ${v === 'settings' ? 'on' : ''}" data-act="nav" data-v="settings" aria-label="Settings" title="Settings">${ICON_GEAR}</button>` : ''}
-    <button class="iconbtn langbtn ${me ? '' : 'push'}" data-act="lang" aria-label="${LANG === 'ar' ? 'Switch to English' : 'Switch to Arabic'}" title="${LANG === 'ar' ? 'English' : 'عربي'}">${LANG === 'ar' ? 'EN' : 'ع'}</button>
+    ${!me && OFFLINE_VIEWS.includes(v) && v !== 'offline' ? `<button class="btn sm push" data-act="off-open">📴 Offline Mode</button>` : ''}
+    <button class="iconbtn langbtn ${me || (OFFLINE_VIEWS.includes(v) && v !== 'offline') ? '' : 'push'}" data-act="lang" aria-label="${LANG === 'ar' ? 'Switch to English' : 'Switch to Arabic'}" title="${LANG === 'ar' ? 'English' : 'عربي'}">${LANG === 'ar' ? 'EN' : 'ع'}</button>
     <button class="iconbtn" data-act="theme" aria-label="${curTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}" title="${curTheme() === 'dark' ? 'Light mode' : 'Dark mode'}">${curTheme() === 'dark' ? ICON_SUN : ICON_MOON}</button>`;
 }
 let renderHeld = false, lastSig = null;
@@ -3411,9 +3440,11 @@ function renderNow() {
   const main = $('#main');
   let view = S.route.view;
   if (S.mode === 'loading') return;
-  if (!S.uid) view = 'auth';
-  else if (!S.profilesLoaded) { main.innerHTML = `<div class="splash"><h2>Loading players…</h2></div>`; mountedKey = null; return; }
-  if (S.uid && S.profilesLoaded && !S.me) { try { localStorage.removeItem(SESSION_KEY); } catch (e) {} S.uid = null; view = 'auth'; }
+  if (!S.uid && view === 'bots') view = 'offline';
+  if (OFFLINE_VIEWS.includes(view) && !(view === 'local' && !S.local)) {}
+  else if (!S.uid) view = 'auth';
+  else if (!S.profilesLoaded) { main.innerHTML = `<div class="splash"><div class="stack" style="align-items:center"><h2>Loading players…</h2><p class="muted small">${navigator.onLine === false ? "You're offline." : 'No internet?'}</p><button class="btn" data-act="off-open">📴 Offline Mode</button></div></div>`; mountedKey = null; return; }
+  if (!OFFLINE_VIEWS.includes(view) && S.uid && S.profilesLoaded && !S.me) { try { localStorage.removeItem(SESSION_KEY); } catch (e) {} S.uid = null; view = 'auth'; }
   if (view === 'local' && !S.local) view = 'play';
   const V = VIEWS[view] || VIEWS.play;
   const key = view + ':' + (S.route.id || '');
@@ -3590,6 +3621,7 @@ VIEWS.auth = {
         <p class="small" id="au-err" style="color:var(--bad)" role="alert"></p>
         <button class="btn primary lg" type="submit">${login ? 'Log in' : 'Create account'}</button>
         ${login ? `<p class="small" style="text-align:center;margin:0"><a href="#" data-act="forgot">I forgot my password</a></p>` : ''}
+        <p class="small" style="text-align:center;margin:0"><a href="#offline" data-act="off-open">📴 No internet? Use Offline Mode (bots, Clock64, play on one device)</a></p>
         <p class="small muted" style="text-align:center">${login ? `New here? <a href="#" data-act="auth-tab" data-m="signup">Create an account</a>` : `Already have an account? <a href="#" data-act="auth-tab" data-m="login">Log in</a>`}</p>
       </form></div>`;
   },
@@ -3648,6 +3680,7 @@ VIEWS.play = {
             <button class="btn ${S.mode === 'online' ? '' : 'primary'}" data-act="practice">Play on this device</button>
           </div>
         </section>
+        <section class="card stack"><div class="spread"><h2>⏱️ Clock64</h2><button class="btn sm" data-act="off-open">📴 Offline Mode</button></div><p class="small muted" style="margin:0">A chess clock for over-the-board games, with every time control.</p><div class="row"><button class="btn primary" data-act="nav" data-v="clock">Open Clock64</button></div></section>
         <section class="card stack"><div class="spread"><h2>Play a bot</h2><button class="btn sm" data-act="nav" data-v="bots">All bots</button></div><div class="row" style="gap:14px">${allBots().slice(0, 6).map(b => `<button data-act="bot-pick" data-id="${esc(b.id)}" style="background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:0" title="Play ${esc(b.name)}">${avatar(b.name, b.photo, 54)}<span class="small" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:72px">${esc(b.name.split(' ')[0])}</span></button>`).join('')}${isClubOwner() ? `<button data-act="bot-new" style="background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;width:72px;padding:0" title="Add a bot"><span style="width:54px;height:54px;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:26px;color:var(--muted)">+</span><span class="small">Add a bot</span></button>` : ''}</div>${allBots().length ? '' : `<p class="small muted" style="margin:0">${isClubOwner() ? 'No bots yet. Add one: give it a name, a photo and a strength.' : 'No bots yet. The club host adds them.'}</p>`}</section>
         <section class="card"><div class="spread" style="margin-bottom:8px"><h2>Your games</h2><button class="btn sm" data-act="nav" data-v="history">All games</button></div>${myGamesHTML()}</section>
       </div>
@@ -4631,6 +4664,119 @@ async function sendChallenge(to, tc) {
 }
 
 
+/* ---------- Offline Mode + Clock64 ---------- */
+const OFFLINE_VIEWS = ['offline', 'clock', 'local'];
+try { if (!S.bots.length) S.bots = JSON.parse(localStorage.getItem('club64-bots-cache') || '[]') || []; } catch (e) {}
+function cacheBots() { try { localStorage.setItem('club64-bots-cache', JSON.stringify(S.bots.slice(0, 40))); } catch (e) {} }
+VIEWS.offline = {
+  html() {
+    const bots = allBots(); const rec = botRecord();
+    return `<div class="stack" style="max-width:820px;margin:0 auto">
+      <div class="spread"><div><span class="label">Works without internet</span><h1>📴 Offline Mode</h1></div>${S.uid && S.me ? `<button class="btn" data-act="nav" data-v="play">← Back to Club 64</button>` : `<button class="btn" data-act="off-login">Log in</button>`}</div>
+      <p class="muted" style="margin:0">Everything here works with no Wi-Fi and no data. Open Club 64 once with internet so your phone keeps a copy.</p>
+      <div class="grid2">
+        <section class="card stack"><div class="spread"><h2>⏱️ Clock64</h2></div><p class="small muted" style="margin:0">A real chess clock for over-the-board games: every time control, increment or delay.</p><button class="btn primary lg" data-act="nav" data-v="clock">Open Clock64</button></section>
+        <section class="card stack"><div class="spread"><h2>👥 Play on this device</h2><span class="pill mono">${fmtTC(S.tc[0], S.tc[1])}</span></div>${tcPicker(S.tc)}<button class="btn primary" data-act="practice">Start game</button></section>
+      </div>
+      <section class="card stack"><h2>🤖 Play the bots</h2>
+        ${bots.length ? `<div class="row" style="gap:14px">${bots.map(b => { const r = rec[b.id]; return `<button data-act="bot-pick" data-id="${esc(b.id)}" class="offbot" title="Play ${esc(b.name)}">${avatar(b.name, b.photo, 56)}<span class="small"><b>${esc(b.name.split(' ')[0])}</b></span><span class="small muted">Level ${b.level + 1}${r ? ` · ${r.w}W ${r.l}L` : ''}</span></button>`; }).join('')}</div>`
+        : `<p class="small muted" style="margin:0">No bots saved on this device yet. Open Club 64 once with internet to download the club's bots.</p>`}
+      </section>
+    </div>`;
+  },
+};
+const CLOCK_PRESETS = [['Bullet', [[1, 0], [1, 1], [2, 1]]], ['Blitz', [[3, 0], [3, 2], [5, 0], [5, 3]]], ['Rapid', [[10, 0], [10, 5], [15, 10], [25, 10]]], ['Classical', [[30, 0], [30, 20], [60, 30], [90, 30]]]];
+const CLK_KEY = 'club64-clock';
+const ck = { cfg: null, run: null, timer: null, wake: null };
+function ckDefaults() { let c = null; try { c = JSON.parse(localStorage.getItem(CLK_KEY + '-cfg') || 'null'); } catch (e) {} return c || { a: 300, b: 300, inc: 3, mode: 'fischer', odds: false, sound: true }; }
+function ckFmt(ms) { ms = Math.max(0, ms); const t = Math.ceil(ms / 100) / 10; if (ms < 20000) { const s = Math.floor(ms / 1000), d = Math.floor((ms % 1000) / 100); return `${s}.${d}`; } const total = Math.ceil(ms / 1000); const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}` : `${m}:${String(s).padStart(2, '0')}`; }
+function ckBeep(f = 880, d = .06) { if (!ck.cfg || !ck.cfg.sound) return; try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = f; g.gain.value = .08; o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + d); } catch (e) {} }
+function ckNew(cfg) { ck.cfg = cfg; ck.run = { ms: { a: cfg.a * 1000, b: cfg.b * 1000 }, moves: { a: 0, b: 0 }, active: null, startedAt: 0, turnUsed: 0, paused: false, flag: null }; ckSave(); }
+function ckSave() { try { localStorage.setItem(CLK_KEY, JSON.stringify({ cfg: ck.cfg, run: ck.run && { ...ck.run, turnUsed: ck.run.turnUsed + ckElapsed(), startedAt: now() } })); } catch (e) {} }
+function ckLoad() { try { const d = JSON.parse(localStorage.getItem(CLK_KEY) || 'null'); if (d && d.cfg && d.run) { ck.cfg = d.cfg; ck.run = { ...d.run, paused: d.run.active ? true : d.run.paused, startedAt: 0 }; } } catch (e) {} }
+function ckElapsed() { const r = ck.run; return r && r.active && !r.paused && !r.flag ? now() - r.startedAt : 0; }
+function ckCharge(side, used) { const c = ck.cfg; if (c.mode === 'delay') return Math.max(0, used - c.inc * 1000); return used; }
+function ckNow() { const r = ck.run; if (!r) return { a: 0, b: 0 }; const out = { ...r.ms }; if (r.active && !r.flag) { const used = r.turnUsed + ckElapsed(); out[r.active] = r.ms[r.active] - ckCharge(r.active, used); } return out; }
+function ckPress(side) {
+  const r = ck.run; if (!r || r.flag) return;
+  if (r.paused && r.active) { return; }
+  if (r.active && r.active !== side) return; // only the player whose clock runs can press
+  const other = side === 'a' ? 'b' : 'a';
+  if (r.active === side) {
+    const used = r.turnUsed + ckElapsed(); const c = ck.cfg;
+    let left = r.ms[side] - ckCharge(side, used);
+    if (c.mode === 'fischer') left += c.inc * 1000; else if (c.mode === 'bronstein') left += Math.min(used, c.inc * 1000);
+    r.ms[side] = left; r.moves[side]++;
+  }
+  r.active = other; r.startedAt = now(); r.turnUsed = 0; ckBeep(700, .04); ckSave(); ckPaint(); ckWake(true);
+}
+function ckPause() { const r = ck.run; if (!r || !r.active || r.flag) return; if (r.paused) { r.paused = false; r.startedAt = now(); } else { r.turnUsed += ckElapsed(); r.paused = true; } ckSave(); ckPaint(); }
+async function ckWake(on) { try { if (on && !ck.wake && navigator.wakeLock) { ck.wake = await navigator.wakeLock.request('screen'); ck.wake.addEventListener('release', () => { ck.wake = null; }); } else if (!on && ck.wake) { ck.wake.release(); ck.wake = null; } } catch (e) {} }
+function ckPaint() {
+  const r = ck.run; if (!r || S.route.view !== 'clock') return; const t = ckNow();
+  for (const s of ['a', 'b']) {
+    const el = document.getElementById('ckh-' + s); if (!el || !el.querySelector('.ck-time')) continue;
+    if (!r.flag && r.active && !r.paused && t[s] <= 0 && r.active === s) { r.flag = s; r.ms[s] = 0; r.paused = false; ckBeep(440, .5); ckSave(); ckWake(false); }
+    el.querySelector('.ck-time').textContent = ckFmt(s === r.flag ? 0 : t[s]);
+    el.querySelector('.ck-moves').textContent = r.moves[s] ? `Moves: ${r.moves[s]}` : '';
+    el.classList.toggle('on', r.active === s && !r.flag); el.classList.toggle('low', t[s] < 10000 && r.active === s && !r.flag); el.classList.toggle('flag', r.flag === s); el.classList.toggle('paused', !!r.paused && r.active === s);
+    const hint = el.querySelector('.ck-hint'); hint.textContent = r.flag === s ? '⏰ Time is up!' : r.flag ? '🏆 Wins on time' : !r.active ? 'Tap to start the other clock' : r.paused && r.active === s ? 'Paused' : r.active === s ? 'Tap when you have moved' : '';
+  }
+  const pb = document.getElementById('ck-pause'); if (pb) { pb.textContent = r.paused ? '▶' : '⏸'; pb.disabled = !r.active || !!r.flag; }
+}
+VIEWS.clock = {
+  html() {
+    if (!ck.run) ckLoad();
+    if (!ck.run || S.ckSetup) {
+      const c = ck.cfg || ckDefaults(); S.ckDraft = S.ckDraft || { ...c }; const d = S.ckDraft;
+      const presetBtn = (b, i) => `<button type="button" class="tc" data-act="ck-preset" data-b="${b}" data-i="${i}" aria-pressed="${d.a === b * 60 && d.b === b * 60 && d.inc === i && (d.mode === 'fischer' || !i)}">${b}+${i}</button>`;
+      return `<div class="stack" style="max-width:720px;margin:0 auto">
+        <div class="spread"><div><span class="label">Chess clock</span><h1>⏱️ Clock64</h1></div><button class="btn" data-act="ck-exit">← Back</button></div>
+        <section class="card stack"><div class="tcgrid">${CLOCK_PRESETS.map(([n, list]) => `<div class="cat">${n}</div><div class="tcrow">${list.map(([b, i]) => presetBtn(b, i)).join('')}</div>`).join('')}</div></section>
+        <section class="card stack"><h2>Custom</h2>
+          <div class="row" style="gap:12px;align-items:flex-end">
+            <div class="field" style="flex:1;min-width:120px"><label class="label" for="ck-a">${d.odds ? 'Player 1 minutes' : 'Minutes each'}</label><input id="ck-a" type="number" min="0" max="600" step="any" inputmode="decimal" value="${+(d.a / 60).toFixed(2)}"></div>
+            ${d.odds ? `<div class="field" style="flex:1;min-width:120px"><label class="label" for="ck-b">Player 2 minutes</label><input id="ck-b" type="number" min="0" max="600" step="any" inputmode="decimal" value="${+(d.b / 60).toFixed(2)}"></div>` : ''}
+            <div class="field" style="flex:1;min-width:120px"><label class="label" for="ck-inc">Seconds per move</label><input id="ck-inc" type="number" min="0" max="300" inputmode="numeric" value="${d.inc}"></div>
+          </div>
+          <div class="field"><span class="label">Type</span><div class="seg">${[['fischer', 'Increment'], ['delay', 'Delay'], ['bronstein', 'Bronstein'], ['none', 'None']].map(([k, l]) => `<button type="button" data-act="ck-mode" data-v="${k}" aria-pressed="${(d.inc ? d.mode : 'none') === k}">${l}</button>`).join('')}</div>
+            <p class="small muted" style="margin:6px 0 0">${{ fischer: 'Increment: the seconds are added after every move.', delay: 'Delay: your clock waits that many seconds before it starts counting down.', bronstein: 'Bronstein: you get back the time you used on a move, up to that many seconds.', none: 'No extra time per move.' }[d.inc ? d.mode : 'none']}</p></div>
+          <label class="setrow" style="border:0"><span class="grow"><b>Different time for each player</b><span class="small muted" style="display:block">Give a stronger player less time</span></span><input type="checkbox" class="switch" data-act="ck-odds" ${d.odds ? 'checked' : ''}></label>
+          <label class="setrow"><span class="grow"><b>Sounds</b></span><input type="checkbox" class="switch" data-act="ck-sound" ${d.sound ? 'checked' : ''}></label>
+        </section>
+        <button class="btn primary lg" data-act="ck-start">Start clock · ${ckFmt(d.a * 1000)}${d.odds && d.b !== d.a ? ' / ' + ckFmt(d.b * 1000) : ''}${d.inc && d.mode !== 'none' ? ` + ${d.inc}s ${({ fischer: '', delay: 'delay', bronstein: 'Bronstein' })[d.mode]}` : ''}</button>
+        ${ck.run ? `<button class="btn" data-act="ck-back">← Back to the running clock</button>` : ''}
+      </div>`;
+    }
+    const half = s => `<button class="ck-half ${s === 'a' ? 'top' : 'bottom'}" id="ckh-${s}" data-act="ck-press" data-s="${s}" aria-label="Player ${s === 'a' ? 1 : 2} clock"><span class="ck-in"><span class="ck-time">--</span><span class="ck-moves"></span><span class="ck-hint"></span></span></button>`;
+    return `<div class="ckwrap">${half('a')}<div class="ck-bar"><button class="ck-ctl" data-act="ck-exit" aria-label="Exit">✕</button><button class="ck-ctl" id="ck-pause" data-act="ck-pause" aria-label="Pause">⏸</button><button class="ck-ctl" data-act="ck-reset" aria-label="Reset">↺</button><button class="ck-ctl" data-act="ck-settings" aria-label="Settings">${ICON_GEAR}</button></div>${half('b')}</div>`;
+  },
+  mount() {
+    document.body.classList.toggle('ckmode', !!ck.run && !S.ckSetup);
+    ckPaint(); clearInterval(ck.timer); if (ck.run && !S.ckSetup) ck.timer = setInterval(ckPaint, 100);
+    const f = id => { const el = $(id); if (el) el.addEventListener('input', () => { const d = S.ckDraft; const a = parseFloat(($('#ck-a') || {}).value) || 0; d.a = Math.round(Math.max(0, Math.min(600, a)) * 60); d.b = d.odds ? Math.round(Math.max(0, Math.min(600, parseFloat(($('#ck-b') || {}).value) || 0)) * 60) : d.a; d.inc = Math.max(0, Math.min(300, parseInt(($('#ck-inc') || {}).value, 10) || 0)); if (d.inc && d.mode === 'none') d.mode = 'fischer'; const btn = document.querySelector('[data-act=ck-start]'); if (btn) btn.textContent = 'Start clock · ' + ckFmt(d.a * 1000) + (d.odds && d.b !== d.a ? ' / ' + ckFmt(d.b * 1000) : '') + (d.inc && d.mode !== 'none' ? ` + ${d.inc}s` : ''); }); };
+    ['#ck-a', '#ck-b', '#ck-inc'].forEach(f);
+  },
+};
+document.addEventListener('keydown', e => { if (S.route.view !== 'clock' || !ck.run || S.ckSetup || e.target.matches('input,textarea')) return; if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); const r = ck.run; ckPress(r.active || 'a'); } else if (e.key === 'p' || e.key === 'P') ckPause(); });
+const OFF_ACTIONS = {
+  'off-open': () => go('offline'),
+  'off-login': () => go('play'),
+  'ck-preset': el => { const b = +el.dataset.b, i = +el.dataset.i; S.ckDraft = { ...S.ckDraft, a: b * 60, b: b * 60, inc: i, mode: i ? 'fischer' : 'none', odds: false }; mountedKey = null; render(); },
+  'ck-mode': el => { const d = S.ckDraft; d.mode = el.dataset.v; if (d.mode === 'none') d.inc = 0; else if (!d.inc) d.inc = d.mode === 'fischer' ? 2 : 5; mountedKey = null; render(); },
+  'ck-odds': el => { S.ckDraft.odds = el.checked; if (!el.checked) S.ckDraft.b = S.ckDraft.a; mountedKey = null; render(); },
+  'ck-sound': el => { S.ckDraft.sound = el.checked; },
+  'ck-start': () => { const d = { ...S.ckDraft }; if (!d.odds) d.b = d.a; if (d.a <= 0 || d.b <= 0) { toast('Set the minutes first.'); return; } if (!d.inc) d.mode = 'none'; try { localStorage.setItem(CLK_KEY + '-cfg', JSON.stringify(d)); } catch (e) {} ckNew(d); S.ckSetup = false; mountedKey = null; render(); },
+  'ck-back': () => { S.ckSetup = false; mountedKey = null; render(); },
+  'ck-press': el => ckPress(el.dataset.s),
+  'ck-pause': () => ckPause(),
+  'ck-reset': () => { if (ck.run && ck.run.active && !ck.run.flag && !ck.run.paused) ckPause(); confirmBox('Reset the clock?', 'Both clocks go back to the start time.', 'Reset', () => { ckNew(ck.cfg); mountedKey = null; render(); }); },
+  'ck-settings': () => { if (ck.run && ck.run.active && !ck.run.paused && !ck.run.flag) ckPause(); S.ckDraft = { ...ck.cfg }; S.ckSetup = true; document.body.classList.remove('ckmode'); mountedKey = null; render(); },
+  'ck-exit': () => { if (ck.run && ck.run.active && !ck.run.paused && !ck.run.flag) ckPause(); clearInterval(ck.timer); ckWake(false); document.body.classList.remove('ckmode'); S.ckSetup = false; S.ckDraft = null; go(S.uid && S.me ? (S.prevRoute && S.prevRoute.view !== 'clock' ? S.prevRoute.view : 'play') : 'offline', S.prevRoute && S.prevRoute.view !== 'clock' ? S.prevRoute.id : undefined); },
+};
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+window.addEventListener('offline', () => { toast("You're offline. 📴 Offline Mode still works."); });
+
 /* ---------- settings ---------- */
 const ICON_GEAR = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
 const PREF_DEFAULTS = { premove: true, sound: true };
@@ -4699,7 +4845,7 @@ VIEWS.settings = {
     const u = $('#un-form'); if (u) u.addEventListener('submit', async e => { e.preventDefault(); const btn = u.querySelector('button'); btn.disabled = true; const msg = await changeUsername($('#un-new').value); btn.disabled = false; const er = $('#un-err'); if (er) er.textContent = msg || ''; });
   },
 };
-const APP_VERSION = 22;
+const APP_VERSION = 25;
 const WHATS_NEW = { v: 19, title: '🎉 Club 64 just got updated!', items: ['⚙️ New Settings page: tap the gear at the top.', '🖼️ Add a profile picture.', '✏️ Change your username.', '♟️ Turn premoves and move sounds on or off.'] };
 function maybeWhatsNew() {
   if (!S.me || S.modal) return; let seen = 0; try { seen = +(localStorage.getItem('club64-seen-ver') || 0); } catch (e) {}
@@ -4724,7 +4870,7 @@ function deviceKind() {
 let a2hsAt = 0;
 function maybeA2HS() {
   if (!S.me || S.modal || isStandalone() || S.mode === 'local' && location.protocol === 'file:') return;
-  if (S.route.view === 'game' || S.route.view === 'local' || (S.liveGames || []).some(g => g.status === 'active' && (g.players || []).includes(S.uid))) return;
+  if (S.route.view === 'game' || S.route.view === 'local' || S.route.view === 'clock' || (S.liveGames || []).some(g => g.status === 'active' && (g.players || []).includes(S.uid))) return;
   let seen = null; try { seen = localStorage.getItem('club64-a2hs'); } catch (e) { return; } if (seen) return;
   if (!a2hsAt) { a2hsAt = now() + 3500; setTimeout(render, 3700); return; } if (now() < a2hsAt) return;
   try { localStorage.setItem('club64-a2hs', '1'); } catch (e) {}
@@ -4917,7 +5063,7 @@ const ACTIONS = {
 };
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]'); if (!el) return;
-  const fn = ACTIONS[el.dataset.act]; if (!fn) return;
+  const fn = ACTIONS[el.dataset.act] || OFF_ACTIONS[el.dataset.act]; if (!fn) return;
   if (el.tagName === 'INPUT' && el.type === 'checkbox') { fn(el, e); return; }
   if (el.closest('#boardwrap') && !['promo', 'promo-cancel', 'pre-clear'].includes(el.dataset.act)) return;
   if (el.tagName === 'BUTTON') e.preventDefault();
@@ -4980,8 +5126,9 @@ setInterval(() => {
 (async function boot() {
   if (typeof Chess === 'undefined') { $('#main').innerHTML = `<div class="empty">The chess engine didn't load. Check your internet connection and reload.</div>`; return; }
   renderBar();
+  if (navigator.onLine === false) { const r0 = routeFromHash(); S.route = OFFLINE_VIEWS.includes(r0.view) ? r0 : { view: 'offline' }; render(); }
   await initBackend();
-  S.route = routeFromHash();
+  S.route = navigator.onLine === false && !OFFLINE_VIEWS.includes(routeFromHash().view) ? { view: 'offline' } : routeFromHash();
   const sess = S.fb ? (S.fbUser ? { uid: S.fbUser.uid } : null) : readSession();
   if (sess) { const p = await S.db.doc('profiles/' + sess.uid).get().catch(() => null); if (p && p.exists) { S.uid = sess.uid; startSubs(); syncContext(); } else { try { localStorage.removeItem(SESSION_KEY); } catch (e) {} } }
   render();
