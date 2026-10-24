@@ -2440,10 +2440,12 @@ Object.assign(AR11, {
   'Set the minutes first.': 'حط الدقايق الأول.', "You're offline. 📴 Offline Mode still works.": 'إنت أوفلاين. 📴 وضع الأوفلاين لسه شغال.', '📴 No internet? Offline Mode': '📴 مفيش نت؟ وضع الأوفلاين',
   '📴 No internet? Use Offline Mode (bots, Clock64, play on one device)': '📴 مفيش نت؟ استخدم وضع الأوفلاين (بوتات، Clock64، اللعب على جهاز واحد)', "You're offline.": 'إنت أوفلاين.',
 });
+Object.assign(AR11, { 'Title': 'العنوان', '👑 Host tools': '👑 أدوات صاحب النادي', 'Announcement to everyone': 'رسالة لكل الناس', 'Also post it in the Club 64 room': 'وكمان ابعتها في أوضة Club 64', 'So players without notifications see it too': 'عشان اللي مقفل الإشعارات يشوفها برضه', '📣 Send to everyone': '📣 ابعت للكل', 'Send this to everyone?': 'تبعت ده للكل؟', 'Send': 'ابعت', 'Write the announcement first.': 'اكتب الرسالة الأول.' });
 for (const [k, v] of Object.entries(AR11)) if (!Object.prototype.hasOwnProperty.call(AR, k)) AR[k] = v;
 const AR_CAT = { Bullet: 'بوليت', Blitz: 'بليتز', Rapid: 'رابيد', Classical: 'كلاسيك' };
 const AR_TAIL = s => s.replace(' · one device', ' · على جهاز واحد').replace(' · vs bot', ' · ضد بوت').replace(' · rated', ' · بتقييم');
 const AR_RX = [
+  [/^(\d+) players? (?:have|has) phone notifications on\.$/, (m, a) => `${a} لعيبة مشغلين الإشعارات.`], [/^Sent to (\d+) phones?(.*)\. 📣$/, (m, a, b) => `اتبعت لـ ${a} موبايل${b ? ' وأوضة Club 64' : ''}. 📣`],
   [/^Start clock · (.+)$/, (m, a) => `شغّل الساعة · ${a}`], [/^Moves: (\d+)$/, (m, a) => `النقلات: ${a}`],
   [/^Your username is now (.+)\. Log in with it from now on\.$/, (m, a) => `اسمك بقى ${a}. ادخل بيه من هنا ورايح.`],
   [/^You can change your username again in (\d+) days?\.$/, (m, a) => `تقدر تغيّر اسمك تاني بعد ${a} يوم.`],
@@ -4835,6 +4837,12 @@ VIEWS.settings = {
         <div class="setrow"><span class="grow"><b>Dark mode</b></span><button class="btn sm" data-act="theme">${curTheme() === 'dark' ? 'On · switch off' : 'Off · switch on'}</button></div>
         <div class="setrow"><span class="grow"><b>Language</b><span class="small muted" style="display:block">English or Egyptian Arabic</span></span><button class="btn sm" data-act="lang">${LANG === 'ar' ? 'English' : 'عربي'}</button></div>
       </section>
+      ${isClubOwner() && S.mode === 'online' ? `<section class="card stack"><h2>👑 Host tools</h2>
+        <div class="field"><label class="label" for="ann-title">Title</label><input id="ann-title" type="text" maxlength="80" value="${esc(S.annTitle != null ? S.annTitle : ANN_TITLE)}"></div>
+        <div class="field"><label class="label" for="ann-text">Announcement to everyone</label><textarea id="ann-text" rows="5" maxlength="500" style="width:100%;resize:vertical">${esc(S.annDraft != null ? S.annDraft : ANN_DEFAULT)}</textarea></div>
+        <label class="setrow" style="border:0"><span class="grow"><b>Also post it in the Club 64 room</b><span class="small muted" style="display:block">So players without notifications see it too</span></span><input type="checkbox" class="switch" id="ann-room" ${S.annRoom === false ? '' : 'checked'}></label>
+        <p class="small muted" style="margin:0">${(() => { const n = Object.values(S.profiles).filter(p => p.ntfy && p.ntfy.topic).length; return n === 1 ? '1 player has phone notifications on.' : `${n} players have phone notifications on.`; })()}</p>
+        <button class="btn primary" data-act="ann-send">📣 Send to everyone</button></section>` : ''}
       <section class="card stack"><h2>Account</h2>
         ${S.mode === 'online' ? `<div class="setrow"><span class="grow"><b>🔔 Notifications</b><span class="small muted" style="display:block">${me.ntfy ? 'On' : 'Off'}</span></span><button class="btn sm" data-act="notif-open">Open</button></div>` : ''}
         <div class="setrow"><span class="grow"><b>Password, recovery email and account</b></span><button class="btn sm" data-act="account">Open</button></div>
@@ -4846,10 +4854,15 @@ VIEWS.settings = {
   mount() {
     const f = $('#set-photo'); if (f) f.addEventListener('change', () => { const file = f.files && f.files[0]; if (file) savePhoto(file); });
     const un = $('#un-new'); if (un) un.addEventListener('input', () => { S.unDraft = un.value; });
+    const at = $('#ann-text'); if (at) at.addEventListener('input', () => { S.annDraft = at.value; });
+    const tt = $('#ann-title'); if (tt) tt.addEventListener('input', () => { S.annTitle = tt.value; });
+    const ar = $('#ann-room'); if (ar) ar.addEventListener('change', () => { S.annRoom = ar.checked; });
     const u = $('#un-form'); if (u) u.addEventListener('submit', async e => { e.preventDefault(); const btn = u.querySelector('button'); btn.disabled = true; const msg = await changeUsername($('#un-new').value); if (!msg) S.unDraft = null; btn.disabled = false; const er = $('#un-err'); if (er) er.textContent = msg || ''; });
   },
 };
-const APP_VERSION = 26;
+const APP_VERSION = 27;
+const ANN_DEFAULT = '🎉 New in Club 64: 📴 Offline Mode and ⏱️ Clock64! Play bots with no internet and use a real chess clock over the board. Open the app to try them.';
+const ANN_TITLE = '♟️ Club 64 Just Got Updated';
 const WHATS_NEW = { v: 19, title: '🎉 Club 64 just got updated!', items: ['⚙️ New Settings page: tap the gear at the top.', '🖼️ Add a profile picture.', '✏️ Change your username.', '♟️ Turn premoves and move sounds on or off.'] };
 function maybeWhatsNew() {
   if (!S.me || S.modal) return; let seen = 0; try { seen = +(localStorage.getItem('club64-seen-ver') || 0); } catch (e) {}
@@ -4955,6 +4968,17 @@ const ACTIONS = {
   'wn-open': () => { S.modal = null; renderModal(); go('settings'); },
   pref: el => setPref(el.dataset.k, el.checked),
   'photo-remove': async () => { try { await S.db.doc('profiles/' + S.uid).update({ photo: null }); S.me = { ...S.me, photo: null }; toast('Picture removed.'); mountedKey = null; render(); } catch (e) { toast("Couldn't save that."); } },
+  'ann-send': () => {
+    if (!isClubOwner() || S.mode !== 'online') return;
+    const text = String(($('#ann-text') || {}).value || '').trim(); if (!text) { toast('Write the announcement first.'); return; }
+    const room = ($('#ann-room') || {}).checked !== false; const title = String(($('#ann-title') || {}).value || '').trim() || '📣 Club 64';
+    const targets = Object.values(S.profiles).filter(p => p.ntfy && p.ntfy.topic);
+    confirmBox('Send this to everyone?', `${targets.length} phone notification${targets.length === 1 ? '' : 's'}${room ? ' + a message in the Club 64 room' : ''}.`, 'Send', async () => {
+      let n = 0; for (const p of targets) { try { await ntfyPost(p.ntfy.topic, text, { title, click: siteURL('play') }); n++; } catch (e) {} await new Promise(r => setTimeout(r, 120)); }
+      if (room) { try { await sendChat('club', null, { t: title + '\n' + text }); } catch (e) {} }
+      S.annDraft = null; S.annTitle = null; toast(`Sent to ${n} phone${n === 1 ? '' : 's'}${room ? ' and the Club 64 room' : ''}. 📣`); mountedKey = null; render();
+    });
+  },
   'notif-open': () => { S.modal = { type: 'notif' }; renderModal(); },
   'notif-on': async () => { if (await setNotif({ topic: 'c64-' + rid(20).toLowerCase(), ch: true, msg: true, tour: true, at: now() })) toast('Notifications are on. Now follow the 3 steps.'); },
   'notif-off': async () => { if (await setNotif(null)) toast('Notifications are off.'); },
